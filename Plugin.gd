@@ -1,8 +1,8 @@
 
 @tool extends EditorPlugin
 
-const AUTOLOAD_NAME := "PSXScreenEffects"
-const AUTOLOAD_PATH := "scripts/Autoload.gd"
+const AUTOLOAD_NAME := "psx_autoload"
+const AUTOLOAD_PATH := "scripts/PsxAutoload.gd"
 
 func _enable_plugin() -> void:
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)

@@ -74,30 +74,35 @@ static func touch_shader_globals() -> void:
 			"value": 1.0
 		})
 		any_setting_changed = true
+
 	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_BIT_DEPTH):
 		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_BIT_DEPTH, {
 			"type": "int",
 			"value": 5
 		})
 		any_setting_changed = true
+
 	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_FOG_COLOR):
 		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_FOG_COLOR, {
 			"type": "color",
 			"value": Color(0.5, 0.5, 0.5, 0.0)
 		})
 		any_setting_changed = true
+
 	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_FOG_FAR):
 		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_FOG_FAR, {
 			"type": "float",
 			"value": 20.0
 		})
 		any_setting_changed = true
+
 	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_FOG_NEAR):
 		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_FOG_NEAR, {
 			"type": "float",
 			"value": 10.0
 		})
 		any_setting_changed = true
+
 	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_SNAP_RESOLUTION):
 		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_SNAP_RESOLUTION, {
 			"type": "float",

@@ -6,14 +6,14 @@ const GLOBAL_VAR_BIT_DEPTH := &"psx_bit_depth"
 const GLOBAL_VAR_FOG_COLOR := &"psx_fog_color"
 const GLOBAL_VAR_FOG_FAR := &"psx_fog_near"
 const GLOBAL_VAR_FOG_NEAR := &"psx_fog_far"
-const GLOBAL_VAR_SNAP_DISTANCE := &"psx_snap_size"
+const GLOBAL_VAR_SNAP_RESOLUTION := &"psx_snap_resolution"
 
 const SETTING_GLOBAL_VAR_AFFINE_STRENGTH := "shader_globals/" + GLOBAL_VAR_AFFINE_STRENGTH
 const SETTING_GLOBAL_VAR_BIT_DEPTH := "shader_globals/" + GLOBAL_VAR_BIT_DEPTH
 const SETTING_GLOBAL_VAR_FOG_COLOR := "shader_globals/" + GLOBAL_VAR_FOG_COLOR
 const SETTING_GLOBAL_VAR_FOG_FAR := "shader_globals/" + GLOBAL_VAR_FOG_FAR
 const SETTING_GLOBAL_VAR_FOG_NEAR := "shader_globals/" + GLOBAL_VAR_FOG_NEAR
-const SETTING_GLOBAL_VAR_SNAP_DISTANCE := "shader_globals/" + GLOBAL_VAR_SNAP_DISTANCE
+const SETTING_GLOBAL_VAR_SNAP_RESOLUTION := "shader_globals/" + GLOBAL_VAR_SNAP_RESOLUTION
 
 static var _affine_strength : float
 static var affine_strength : float :
@@ -50,12 +50,12 @@ static var fog_near : float :
 		_fog_near = value
 		RenderingServer.global_shader_parameter_set(GLOBAL_VAR_FOG_NEAR, value)
 
-static var _snap_distance : float
-static var snap_distance : float :
-	get: return _snap_distance
+static var _snap_resolution : float
+static var snap_resolution : float :
+	get: return _snap_resolution
 	set(value):
-		_snap_distance = value
-		RenderingServer.global_shader_parameter_set(GLOBAL_VAR_SNAP_DISTANCE, value)
+		_snap_resolution = value
+		RenderingServer.global_shader_parameter_set(GLOBAL_VAR_SNAP_RESOLUTION, value)
 
 static func _static_init() -> void:
 	_affine_strength = ProjectSettings.get_setting(SETTING_GLOBAL_VAR_AFFINE_STRENGTH)[&"value"]
@@ -63,7 +63,7 @@ static func _static_init() -> void:
 	_fog_color = ProjectSettings.get_setting(SETTING_GLOBAL_VAR_FOG_COLOR)[&"value"]
 	_fog_far = ProjectSettings.get_setting(SETTING_GLOBAL_VAR_FOG_FAR)[&"value"]
 	_fog_near = ProjectSettings.get_setting(SETTING_GLOBAL_VAR_FOG_NEAR)[&"value"]
-	_snap_distance = ProjectSettings.get_setting(SETTING_GLOBAL_VAR_SNAP_DISTANCE)[&"value"]
+	_snap_resolution = ProjectSettings.get_setting(SETTING_GLOBAL_VAR_SNAP_RESOLUTION)[&"value"]
 
 static func touch_shader_globals() -> void:
 	var any_setting_changed := false
@@ -98,10 +98,10 @@ static func touch_shader_globals() -> void:
 			"value": 10.0
 		})
 		any_setting_changed = true
-	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_SNAP_DISTANCE):
-		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_SNAP_DISTANCE, {
+	if not ProjectSettings.has_setting(SETTING_GLOBAL_VAR_SNAP_RESOLUTION):
+		ProjectSettings.set_setting(SETTING_GLOBAL_VAR_SNAP_RESOLUTION, {
 			"type": "float",
-			"value": 0.025
+			"value": 64.0
 		})
 		any_setting_changed = true
 

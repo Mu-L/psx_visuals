@@ -7,7 +7,7 @@ global uniform float psx_affine_strength;
 global uniform vec4 psx_fog_color;
 global uniform float psx_fog_far;
 global uniform float psx_fog_near;
-global uniform float psx_snap_distance;
+global uniform float psx_snap_resolution;
 
 // If enabled, we will Gouraud shading and multiply vertex colors to albedo.
 uniform bool use_vertex_colors_in_albedo = true;
@@ -31,10 +31,10 @@ varying vec2 affine_uv_scaled;
 
 void vertex() {
     VERTEX_COLOR = COLOR.rgb;
-	
-	VERTEX = snap(VERTEX, MODELVIEW_MATRIX, psx_snap_distance);
+
+	VERTEX = snap(VERTEX, MODELVIEW_MATRIX, psx_snap_resolution);
 	vec3 vertex_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	
+
 	VERTEX_DEPTH = distance(vertex_world, CAMERA_POSITION_WORLD);
 	affine_uv_scaled = UV * VERTEX_DEPTH;
 	fog_strength = (use_global_fog && psx_fog_near != psx_fog_far) ?
@@ -47,7 +47,7 @@ void vertex() {
 
 		bool back_facing = dot(normal_world, view_dir) < 0.0;
 		if (back_facing) NORMAL = -NORMAL;
-	}	
+	}
 }
 
 void fragment() {

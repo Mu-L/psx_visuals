@@ -1,13 +1,12 @@
 shader_type spatial;
 render_mode blend_mix, vertex_lighting, ensure_correct_normals, diffuse_lambert, specular_occlusion_disabled, specular_disabled, shadows_disabled, fog_disabled, cull_disabled;
 
-#include "uid://bbm41nyy2th3f"
+#include "psx.gdshaderinc"
 
 global uniform float psx_affine_strength;
 global uniform vec4 psx_fog_color;
 global uniform float psx_fog_far;
 global uniform float psx_fog_near;
-global uniform float psx_snap_resolution;
 
 // If enabled, we will Gouraud shading and multiply vertex colors to albedo.
 uniform bool use_vertex_colors_in_albedo = true;
@@ -35,7 +34,7 @@ varying vec2 affine_uv_scaled;
 void vertex() {
     VERTEX_COLOR = COLOR.rgb;
 
-	VERTEX = snap(VERTEX, MODELVIEW_MATRIX, psx_snap_resolution);
+	VERTEX = snap(VERTEX, MODELVIEW_MATRIX);
 	vec3 vertex_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 
 	VERTEX_DEPTH = distance(vertex_world, CAMERA_POSITION_WORLD);

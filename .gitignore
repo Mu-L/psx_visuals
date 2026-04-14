@@ -6,6 +6,3 @@
 .godot/
 .vscode/
 /android/
-
-*.blend[0-9]
-*.kra~

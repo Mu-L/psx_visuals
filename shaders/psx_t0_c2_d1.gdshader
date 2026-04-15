@@ -1,27 +1,24 @@
 shader_type spatial;
-render_mode blend_mix, vertex_lighting, ensure_correct_normals, diffuse_lambert, specular_occlusion_disabled, specular_disabled, shadows_disabled, fog_disabled, cull_disabled;
+render_mode depth_test_inverted, cull_disabled, blend_mix, vertex_lighting, ensure_correct_normals, diffuse_lambert, specular_occlusion_disabled, specular_disabled, shadows_disabled, fog_disabled;
 
-#include "psx.gdshaderinc"
+#include "res://addons/psx_visuals/shaders/psx.gdshaderinc"
 
 global uniform float psx_affine_strength;
 global uniform vec4 psx_fog_color;
 global uniform float psx_fog_far;
 global uniform float psx_fog_near;
 
-// If enabled, we will Gouraud shading and multiply vertex colors to albedo.
+// If enabled, we will perform Gouraud shading and multiply vertex colors to [albedo_texture].
 uniform bool use_vertex_colors_in_albedo = true;
 
 // If enabled, use global PSX fog. Otherwise, fog will not appear on these surfaces, as if there is a hole in the fog.
 uniform bool use_global_fog = true;
 
-// If enabled, this approximates the correct normals for backfaces, as if the mesh is double-sided.
-uniform bool flip_backface_normals = true;
+uniform sampler2D albedo_texture: hint_default_white, filter_nearest;
+uniform vec4 albedo_color: source_color = vec4(1);
 
-uniform sampler2D albedo: hint_default_white, filter_nearest;
-uniform vec4 albedo_tint: source_color = vec4(1);
-
-uniform sampler2D emission: hint_default_black, filter_nearest;
-uniform vec3 emission_tint: source_color = vec3(1);
+uniform sampler2D emission_texture: hint_default_black, filter_nearest;
+uniform vec3 emission: source_color = vec3(1);
 
 uniform float alpha_scissor_threshold: hint_range(0.0, 1.0, 0.01) = 0.5;
 
@@ -43,12 +40,10 @@ void vertex() {
 		clamp(psx_fog_color.a * (VERTEX_DEPTH - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
 		0.0;
 
-	if (flip_backface_normals) {
-		vec3 normal_world = MODEL_NORMAL_MATRIX * NORMAL;
-		vec3 view_dir = normalize(CAMERA_POSITION_WORLD - vertex_world);
-
-		bool back_facing = dot(normal_world, view_dir) < 0.0;
-		if (back_facing) NORMAL = -NORMAL;
+	vec3 normal_world = MODEL_NORMAL_MATRIX * NORMAL;
+	vec3 view_dir = normalize(CAMERA_POSITION_WORLD - vertex_world);
+	if (dot(normal_world, view_dir) < 0.0) {
+		NORMAL = -NORMAL;
 	}
 }
 
@@ -58,15 +53,16 @@ void fragment() {
 
 	vec3 fog_rgb = mix(vec3(0), psx_fog_color.rgb, fog_strength);
 
-	vec4 albedo_color = texture(albedo, uv) * albedo_tint;
-	if (use_vertex_colors_in_albedo) albedo_color *= vec4(VERTEX_COLOR, 1.0);
-	ALBEDO = albedo_color.rgb * (1.0 - fog_strength) + fog_rgb;
-
-	ALPHA = albedo_color.a;
+	vec4 albedo_final = texture(albedo_texture, uv) * albedo_color;
+	if (use_vertex_colors_in_albedo) {
+		albedo_final *= vec4(VERTEX_COLOR, 1.0);
+	}
+	ALBEDO = albedo_final.rgb * (1.0 - fog_strength) + fog_rgb;
+	ALPHA *= albedo_final.a;
 	ALPHA_SCISSOR_THRESHOLD = alpha_scissor_threshold;
 
-	vec4 emission_color = texture(emission, uv) * vec4(emission_tint, 1.0);
-	EMISSION = emission_color.rgb + fog_rgb;
+	vec4 emission_final = texture(emission_texture, uv) * vec4(emission, 1.0);
+	EMISSION = (emission_final.rgb * emission_final.a) + fog_rgb;
 
 	SPECULAR = 0.0;
 	ROUGHNESS = 0.0;

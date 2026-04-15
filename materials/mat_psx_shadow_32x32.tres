@@ -1,12 +1,18 @@
-[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://20ut3o26ngws"]
+[gd_resource type="ShaderMaterial" script_class="PsxMaterial3D" format=3 uid="uid://dueuwdraosbov"]
 
-[ext_resource type="Shader" uid="uid://cwv7n2wljmf0j" path="res://addons/psx_visuals/shaders/psx_transparent.gdshader" id="1_busvn"]
+[ext_resource type="Shader" uid="uid://cwv7n2wljmf0j" path="res://addons/psx_visuals/shaders/psx_t2_c0_d0.gdshader" id="1_busvn"]
+[ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx_visuals/scripts/PsxMaterial3D.gd" id="1_gtx0m"]
 [ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx_visuals/textures/shadow_32x32.png" id="2_jq7op"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("1_busvn")
 shader_parameter/use_vertex_colors_in_albedo = true
-shader_parameter/albedo = ExtResource("2_jq7op")
-shader_parameter/albedo_tint = Color(1, 1, 1, 0.5019608)
-shader_parameter/emission_tint = Color(1, 1, 1, 1)
+shader_parameter/use_global_fog = true
+shader_parameter/albedo_texture = ExtResource("2_jq7op")
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/emission = Color(1, 1, 1, 1)
+script = ExtResource("1_gtx0m")
+transparency_mode = 2
+albedo_texture = ExtResource("2_jq7op")
+emission = Color(1, 1, 1, 1)

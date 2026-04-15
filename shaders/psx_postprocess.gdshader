@@ -1,6 +1,6 @@
 shader_type canvas_item;
 
-#include "psx.gdshaderinc"
+#include "res://addons/psx_visuals/shaders/psx.gdshaderinc"
 
 uniform sampler2D SCREEN_TEXTURE: hint_screen_texture;
 

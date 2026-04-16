@@ -24,12 +24,26 @@ static var SHADER_TABLE: Array[Shader]
 
 
 static func _static_init() -> void:
-	if Engine.is_editor_hint() and SHADER_TABLE.is_empty():
+	if Engine.is_editor_hint():
+		if not SHADER_TABLE.is_empty(): return
+
 		_precompile_shaders()
 
 		for material: PsxMaterial3D in PsxPlugin.get_resources(["res://"], "PsxMaterial3D"):
 			material._refresh_shader()
 			ResourceSaver.save(material)
+
+	else:
+		_preload_shaders()
+
+
+static func _preload_shaders() -> void:
+	SHADER_TABLE.resize(SHADER_TABLE_SIZE)
+	for idx in SHADER_TABLE_SIZE:
+		var path := SHADER_PATH_TEMPLATE % idx
+		if not ResourceLoader.exists(path): continue
+
+		SHADER_TABLE[idx] = ResourceLoader.load(path)
 
 
 static func _precompile_shaders() -> void:
@@ -178,6 +192,8 @@ static func _precompile_shaders() -> void:
 
 
 func _init() -> void:
+	if not Engine.is_editor_hint(): return
+
 	shader = SHADER_TABLE[24]
 
 

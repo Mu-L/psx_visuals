@@ -1,4 +1,4 @@
-extends CanvasLayer
+@tool extends CanvasLayer
 
 const POST_PROCESS_LAYER: int = RenderingServer.CANVAS_LAYER_MIN
 const POST_PROCESS_MATERIAL: ShaderMaterial = preload("uid://da2sluxj84btb")

@@ -40,6 +40,7 @@ const PRECOMPILE_SHADERS_KEY := "psx/precompile_shaders"
 var file_system_context_menu_plugin: PsxFileSystemContextMenuPlugin
 var scene_tree_context_menu_plugin: PsxSceneTreeContextMenuPlugin
 var inspector_plugin: PsxInspectorPlugin
+var post_process_node: Node
 
 const CONVERSION_OPTIONS_DEFAULT := {
 	&"exclude_addons": false,
@@ -72,6 +73,11 @@ func _enter_tree() -> void:
 		inspector_plugin = PsxInspectorPlugin.new()
 		add_inspector_plugin(inspector_plugin)
 
+	if post_process_node == null:
+		post_process_node = CanvasLayer.new()
+		post_process_node.set_script(preload("res://addons/psx_visuals/scripts/PsxAutoload.gd"))
+		get_editor_interface().get_editor_viewport_3d().add_child(post_process_node)
+		get_editor_interface().get_editor_viewport_3d().print_tree_pretty()
 
 func _disable_plugin() -> void:
 	remove_autoload_singleton(AUTOLOAD_NAME)
@@ -95,6 +101,9 @@ func _exit_tree() -> void:
 	if inspector_plugin != null:
 		remove_inspector_plugin(inspector_plugin)
 		inspector_plugin = null
+
+	if post_process_node != null:
+		post_process_node.queue_free()
 
 
 func convert_entire_project() -> void:

@@ -46,6 +46,7 @@ const CONVERSION_OPTIONS_DEFAULT := {
 	&"exclude_addons": false,
 	&"material_take_over_path": true,
 	&"material_force_vertex_lighting": true,
+	&"material_force_vertex_fog": true,
 }
 
 func _enable_plugin() -> void:
@@ -261,17 +262,26 @@ func create_psx_material_from(material: Material, options := CONVERSION_OPTIONS_
 		var result := PsxMaterial3D.new()
 
 		match material.transparency:
-			BaseMaterial3D.TRANSPARENCY_ALPHA, BaseMaterial3D.TRANSPARENCY_ALPHA_HASH, BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS:
+			BaseMaterial3D.TRANSPARENCY_DISABLED:
+				result.transparency_mode = 0
+			BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR:
 				result.transparency_mode = 1
 			_:
-				result.transparency_mode = 0
+				result.transparency_mode = 2
 
-		if options[&"material_force_vertex_lighting"] and material.shading_mode == BaseMaterial3D.SHADING_MODE_PER_PIXEL:
-			result.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
-		else:
-			result.shading_mode = material.shading_mode
+		result.shading_mode = (
+			BaseMaterial3D.SHADING_MODE_PER_VERTEX
+			if options[&"material_force_vertex_lighting"] and material.shading_mode == BaseMaterial3D.SHADING_MODE_PER_PIXEL
+			else material.shading_mode
+		)
 
-		for param in PsxMaterial3D.PSX_MATERIAL_TRANSFERABLE_PARAMS:
+		result.fog_mode = (
+				BaseMaterial3D.SHADING_MODE_PER_VERTEX
+				if options[&"material_force_vertex_fog"] and not material.disable_fog
+				else int(not material.disable_fog)
+		)
+
+		for param in PsxMaterial3D.TRANSFERABLE_PARAMS:
 			result.set(param, material.get(param))
 
 		return result
@@ -279,7 +289,7 @@ func create_psx_material_from(material: Material, options := CONVERSION_OPTIONS_
 	if material is ShaderMaterial:
 		var result := PsxMaterial3D.new()
 
-		for param in PsxMaterial3D.PSX_MATERIAL_TRANSFERABLE_PARAMS:
+		for param in PsxMaterial3D.TRANSFERABLE_PARAMS:
 			var param_value = material.get_shader_parameter(param)
 			if param_value == null: continue
 			var start_value = result.get(param)

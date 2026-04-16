@@ -1,17 +1,26 @@
 @tool class_name PsxMaterial3D extends ShaderMaterial
 
-const PSX_MATERIAL_TRANSFERABLE_PARAMS: PackedStringArray = [
+const TRANSFERABLE_PARAMS: PackedStringArray = [
+	&"alpha_scissor_threshold",
 	&"cull_mode",
+	&"depth_test",
+	&"vertex_color_use_as_albedo",
 	&"albedo_texture",
 	&"albedo_color",
-	&"alpha_scissor_threshold",
-	&"emission_texture",
+	&"emission_enabled",
 	&"emission",
+	&"emission_energy_multiplier",
+	&"emission_operator",
+	&"emission_on_uv2",
+	&"emission_texture",
 ]
+
+
+#region Shader Precompilation
 
 const SHADER_CODE_INSERT_POSITION := 20 ## "shader_type spatial;\n" == 20
 const SHADER_PATH_DIR := "res://addons/psx_visuals/shaders/precompile"
-const SHADER_PATH_TEMPLATE := "res://addons/psx_visuals/shaders/precompile/psx_%03d.gdshader"
+const SHADER_PATH_TEMPLATE := "res://addons/psx_visuals/shaders/precompile/psx_%04d.gdshader"
 const SHADER_FLAGS_ALWAYS := ["blend_mix", "diffuse_lambert", "specular_occlusion_disabled", "specular_disabled", "shadows_disabled"]
 const SHADER_FLAGS := [
 	["", "", "depth_draw_always"],
@@ -24,35 +33,6 @@ const SHADER_FLAGS := [
 
 static var SHADER_FLAGS_PERMUTATION_SIZES: PackedInt32Array
 static var SHADER_TABLE: Array[Shader]
-
-static func _static_init() -> void:
-	SHADER_FLAGS_PERMUTATION_SIZES.resize(SHADER_FLAGS.size() + 1)
-	SHADER_FLAGS_PERMUTATION_SIZES.fill(1)
-	for f in SHADER_FLAGS.size():
-		for fi in f:
-			SHADER_FLAGS_PERMUTATION_SIZES[-f - 2] *= SHADER_FLAGS[f - fi].size()
-		SHADER_FLAGS_PERMUTATION_SIZES[-1] *= SHADER_FLAGS_PERMUTATION_SIZES[-f]
-
-	if Engine.is_editor_hint():
-		if not SHADER_TABLE.is_empty(): return
-
-		_precompile_shaders()
-
-		for material: PsxMaterial3D in PsxPlugin.get_resources(["res://"], "PsxMaterial3D"):
-			material._refresh_shader()
-			ResourceSaver.save(material)
-
-	else:
-		_preload_shaders()
-
-
-static func _preload_shaders() -> void:
-	SHADER_TABLE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
-	for idx in SHADER_FLAGS_PERMUTATION_SIZES[-1]:
-		var path := SHADER_PATH_TEMPLATE % idx
-		if not ResourceLoader.exists(path): continue
-
-		SHADER_TABLE[idx] = ResourceLoader.load(path)
 
 
 static func _precompile_shaders() -> void:
@@ -88,6 +68,38 @@ static func _precompile_shaders() -> void:
 
 		SHADER_TABLE[idx] = ResourceLoader.load(shader.resource_path)
 		idx += 1
+
+
+static func _preload_shaders() -> void:
+	SHADER_TABLE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
+	for idx in SHADER_FLAGS_PERMUTATION_SIZES[-1]:
+		var path := SHADER_PATH_TEMPLATE % idx
+		if not ResourceLoader.exists(path): continue
+
+		SHADER_TABLE[idx] = ResourceLoader.load(path)
+
+#endregion
+
+
+static func _static_init() -> void:
+	SHADER_FLAGS_PERMUTATION_SIZES.resize(SHADER_FLAGS.size() + 1)
+	SHADER_FLAGS_PERMUTATION_SIZES.fill(1)
+	for f in SHADER_FLAGS.size():
+		for fi in f:
+			SHADER_FLAGS_PERMUTATION_SIZES[-f - 2] *= SHADER_FLAGS[f - fi].size()
+		SHADER_FLAGS_PERMUTATION_SIZES[-1] *= SHADER_FLAGS_PERMUTATION_SIZES[-f]
+
+	if Engine.is_editor_hint():
+		if not SHADER_TABLE.is_empty(): return
+
+		_precompile_shaders()
+
+		for material: PsxMaterial3D in PsxPlugin.get_resources(["res://"], "PsxMaterial3D"):
+			material._refresh_shader()
+			ResourceSaver.save(material)
+
+	else:
+		_preload_shaders()
 
 
 @export_subgroup("Transparency")
@@ -175,6 +187,7 @@ static func _precompile_shaders() -> void:
 @export_enum("Add", "Multiply") var emission_operator: int = BaseMaterial3D.EmissionOperator.EMISSION_OP_ADD:
 	set(value):
 		emission_operator = value
+		_refresh_shader()
 
 
 @export var emission_on_uv2: bool = false:

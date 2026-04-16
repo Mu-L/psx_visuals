@@ -9,21 +9,30 @@ const PSX_MATERIAL_TRANSFERABLE_PARAMS: PackedStringArray = [
 	&"emission",
 ]
 
-const SHADER_TABLE_SIZE := 729
+const SHADER_CODE_INSERT_POSITION := 20 ## "shader_type spatial;\n" == 20
+const SHADER_PATH_DIR := "res://addons/psx_visuals/shaders/precompile"
 const SHADER_PATH_TEMPLATE := "res://addons/psx_visuals/shaders/precompile/psx_%03d.gdshader"
-const SHADER_ALL_FLAGS := ["blend_mix", "diffuse_lambert", "specular_occlusion_disabled", "specular_disabled", "shadows_disabled"]
-const SHADER_T_FLAGS := ["", "", "depth_draw_always"]
-const SHADER_C_FLAGS := ["cull_back", "cull_front", "cull_disabled"]
-const SHADER_D_FLAGS := ["depth_test_default", "depth_test_inverted", "depth_test_disabled"]
-const SHADER_S_FLAGS := ["unshaded", "", "vertex_lighting"]
-const SHADER_F_FLAGS := ["fog_disabled", "", "#VERTEX_FOG_ENABLED"]
-const SHADER_E_FLAGS := ["", "#EMISSION_ADD", "#EMISSION_MULTIPLY"]
-const SHADER_CODE_INSERTION := 20 ## "shader_type spatial;\n" == 20
+const SHADER_FLAGS_ALWAYS := ["blend_mix", "diffuse_lambert", "specular_occlusion_disabled", "specular_disabled", "shadows_disabled"]
+const SHADER_FLAGS := [
+	["", "", "depth_draw_always"],
+	["cull_back", "cull_front", "cull_disabled"],
+	["depth_test_default", "depth_test_inverted", "depth_test_disabled"],
+	["unshaded", "", "vertex_lighting"],
+	["fog_disabled", "", "#VERTEX_FOG_ENABLED"],
+	["", "#EMISSION_ADD", "#EMISSION_MULTIPLY"],
+]
 
+static var SHADER_FLAGS_PERMUTATION_SIZES: PackedInt32Array
 static var SHADER_TABLE: Array[Shader]
 
-
 static func _static_init() -> void:
+	SHADER_FLAGS_PERMUTATION_SIZES.resize(SHADER_FLAGS.size() + 1)
+	SHADER_FLAGS_PERMUTATION_SIZES.fill(1)
+	for f in SHADER_FLAGS.size():
+		for fi in f:
+			SHADER_FLAGS_PERMUTATION_SIZES[-f - 2] *= SHADER_FLAGS[f - fi].size()
+		SHADER_FLAGS_PERMUTATION_SIZES[-1] *= SHADER_FLAGS_PERMUTATION_SIZES[-f]
+
 	if Engine.is_editor_hint():
 		if not SHADER_TABLE.is_empty(): return
 
@@ -38,8 +47,8 @@ static func _static_init() -> void:
 
 
 static func _preload_shaders() -> void:
-	SHADER_TABLE.resize(SHADER_TABLE_SIZE)
-	for idx in SHADER_TABLE_SIZE:
+	SHADER_TABLE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
+	for idx in SHADER_FLAGS_PERMUTATION_SIZES[-1]:
 		var path := SHADER_PATH_TEMPLATE % idx
 		if not ResourceLoader.exists(path): continue
 
@@ -47,49 +56,38 @@ static func _preload_shaders() -> void:
 
 
 static func _precompile_shaders() -> void:
-	var shader_template := load("res://addons/psx_visuals/shaders/psx_template.gdshader")
-	SHADER_TABLE.resize(SHADER_TABLE_SIZE)
+	var template := load("res://addons/psx_visuals/shaders/psx_template.gdshader")
+	SHADER_TABLE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
 
-	var shader_flags: PackedStringArray = SHADER_ALL_FLAGS.duplicate()
-	shader_flags.resize(shader_flags.size() + 6)
-	var idx := 0
-	for t in 3:
-		shader_flags[-6] = SHADER_T_FLAGS[t]
-		for c in 3:
-			shader_flags[-5] = SHADER_C_FLAGS[c]
-			for d in 3:
-				shader_flags[-4] = SHADER_D_FLAGS[d]
-				for s in 3:
-					shader_flags[-3] = SHADER_S_FLAGS[s]
-					for f in 3:
-						shader_flags[-2] = SHADER_F_FLAGS[f]
-						for e in 3:
-							shader_flags[-1] = SHADER_E_FLAGS[e]
+	var flags: PackedStringArray = SHADER_FLAGS_ALWAYS.duplicate()
 
-							var path := SHADER_PATH_TEMPLATE % idx
+	for f in SHADER_FLAGS.size():
+		flags.append(SHADER_FLAGS[f][0])
 
-							var shader := ResourceLoader.load(path) if ResourceLoader.exists(path) else Shader.new()
-							shader.code = shader_template.code
+	for idx in SHADER_FLAGS_PERMUTATION_SIZES[-1]:
+		for fdx in SHADER_FLAGS.size():
+			flags[fdx + SHADER_FLAGS_ALWAYS.size()] = SHADER_FLAGS[fdx][(idx / SHADER_FLAGS_PERMUTATION_SIZES[fdx] % SHADER_FLAGS[fdx].size())]
 
-							var render_flags_string: String
-							var define_flags_string: String
-							for flag in shader_flags:
-								if flag.is_empty(): continue
-								if flag.begins_with("#"):
-									define_flags_string += "\n#define " + flag.right(-1) + ";"
-								else:
-									render_flags_string += flag + ", "
+		var path := SHADER_PATH_TEMPLATE % idx
+		var shader := ResourceLoader.load(path) if ResourceLoader.exists(path) else Shader.new()
+		shader.take_over_path(path)
 
-							if not render_flags_string.is_empty():
-								render_flags_string = "\nrender_mode " + render_flags_string.left(-2) + ";"
+		var render_flags_string: String
+		var define_flags_string: String
+		for flag in flags:
+			if flag.is_empty(): continue
+			if flag.begins_with("#"):
+				define_flags_string += "\n#define " + flag.right(-1) + ";"
+			else:
+				render_flags_string += flag + ", "
 
-							shader.code = shader.code.insert(SHADER_CODE_INSERTION, render_flags_string + define_flags_string)
+		render_flags_string = "\nrender_mode " + render_flags_string.left(-2) + ";"
 
-							shader.take_over_path(path)
-							ResourceSaver.save(shader)
+		shader.code = template.code.insert(SHADER_CODE_INSERT_POSITION, render_flags_string + define_flags_string)
+		ResourceSaver.save(shader)
 
-							SHADER_TABLE[idx] = ResourceLoader.load(shader.resource_path)
-							idx += 1
+		SHADER_TABLE[idx] = ResourceLoader.load(shader.resource_path)
+		idx += 1
 
 
 @export_subgroup("Transparency")
@@ -198,14 +196,7 @@ func _init() -> void:
 
 
 func _refresh_shader() -> void:
-	shader = SHADER_TABLE[
-		+ transparency_mode * 243
-		+ cull_mode * 81
-		+ depth_test * 27
-		+ shading_mode * 9
-		+ fog_mode * 3
-		+ (emission_operator + 1 if emission_enabled else 0)
-	]
+	shader = SHADER_TABLE[_get_shader_index()]
 
 	set_shader_parameter(&"alpha_scissor_threshold", alpha_scissor_threshold if transparency_mode == 1 else 0.0)
 	set_shader_parameter(&"emission", emission)
@@ -213,3 +204,14 @@ func _refresh_shader() -> void:
 	set_shader_parameter(&"emission_operator", emission_operator)
 	set_shader_parameter(&"emission_on_uv2", emission_on_uv2)
 	set_shader_parameter(&"emission_texture", emission_texture)
+
+
+func _get_shader_index() -> int:
+	return (
+		+ transparency_mode * 243
+		+ cull_mode * 81
+		+ depth_test * 27
+		+ shading_mode * 9
+		+ fog_mode * 3
+		+ (emission_operator + 1 if emission_enabled else 0)
+	)

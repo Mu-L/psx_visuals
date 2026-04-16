@@ -3,26 +3,59 @@
 
 This addon contains a set of shaders and materials you can use to make your game look like it was built on the original PlayStation hardware. Almost all of the limitations of the console have been faithfully implemented into a versatile set of shaders.
 
-# Features
+## Table of Contents
 
-## Quickstart / Conversion Wizard
+| Section | Description |
+|-|-|
+| [Conversion Wizard](#conversion-wizard) | How to convert scenes/materials in your project to PSX |
+| [Materials](#materials) | A list of included materials and what they do |
+| [Material Parameters](#material-parameters) | How to use/modify parameters in each of the included materials |
+| [Shaders](#shaders) | A list of included shaders and what they do |
+| [Global Parameters](#global-shader-parameters) | How to use/modify included global shader features
 
-In a PSX-style game, almost all `MeshInstance3D`s will be using similar shaders included in this addon. Consider using the Conversion Wizard to do any of the following:
 
-- Override the surface materials of any newly created `MeshInstance3D` nodes
-- Override the surface materials of any currently existing `MeshInstance3D` nodes in your scene(s)
-- Convert any material in the FileSystem to a PSX material
+## Conversion Wizard
 
-You can then change the material of any `MeshInstance3D` at any time.
+In a PSX-style game, you will want to use a PSX material on almost all `MeshInstance3D`s in every 3D scene. You can do this manually, but this can take lots of time. The Conversion Wizard is a tool that can help you convert scenes, materials, or an entire project into PSX.
 
-## Materials
+> [!CAUTION]
+> Using the conversion Wizard is currently irreversible. Make a backup or VCS commit of your project before using.
 
-There are a few built-in materials for use or duplication:
+Keep in mind during the conversion process:
 
-- `mat_psx_default.tres` : Default material to showcase vertex effects. Works with Gouraud shading too.
-- `mat_psx_placeholder.tres` : Placeholder material to showcase affine texture warping.
-- `mat_psx_post_process.tres` : Built-in material to showcase bit depth reduction. DO NOT DELETE!
-- `mat_psx_shadow_32x32.tres` : Built-in material to showcase `RayShadowCaster` shadows.
+<!-- - If the `Node.owner` is not the scene root, the `Node` will not be processed. -->
+- You can add a meta value named `psx_ignore` of type `bool` to any Node to control if the Wizard should modify any `Node`.
+	- If `null` or not present, the converter will process the `Node` normally.
+	- If `false`, the converter will ignore THIS `Node`, but will continue on to its children.
+	- If `true`, the converter will ignore this `Node`, AND ALL its children.
+- You can add a meta value named `psx_auto` of type `Material` to the root of any scene to enforce
+
+
+<!--
+This is how it works:
+
+- For all selected scenes, the Wizard will march through every `Node` in the tree. If:
+	- The `Node` is a `MeshInstance3D`, AND
+	- The `Node` DOES NOT contain the meta value `_psx_ignore == true` :
+- Try to convert the replace available surfaces overrides to PSX. Then, for each `MeshInstance3D.get_surface_material_override()`, if:
+	- The `Material` is NOT null, AND (
+	- The `Material` is NOT a `ShaderMaterial`, OR
+	- The `Material.shader.resource_name` DOES NOT begin with `psx_` ) :
+- See if a PSX material already exists for the given material.
+	- If `true`: Use that material; continue to next surface.
+	- If `false`:
+		- Create a new material with PSX shader.
+		- Save alongside existing material; prefix with `psx_`.
+		- Set new material to the surface material override.
+		- Material parameters will be copied over, using naming convention of `StandardMaterial3D`. -->
+
+
+### How to Use
+
+1. Do either of the following (these perform the same action):
+	- Go to `Project > Tools > Convert Scene(s) to PSX...`
+	- Go to `Command Palette > Psx > Convert Scene(s) to PSX...`
+
 
 ## Shaders
 
@@ -33,7 +66,8 @@ There are four shaders to choose from, though all of them are nearly identical e
 - `psx_transparent.gdshader` : Suitable for semi-opaque textures.
 - `psx_transparent_double.gdshader` : Double sided version of `psx_transparent`.
 
-## Global Shader Features
+
+## Global Shader Parameters
 
 This is a list of all global shader properties (modified in `Project Settings > Globals > Shader Globals`). These properties are created when enabling the plugin for the first time.
 
@@ -54,9 +88,6 @@ This component recreates the dizzying effect of textures warping due to a lack o
 ### Limited Color Bit Depth
 
 This component recreates the effect of rendered colors being limited to a certain number of bits, with a dithered matrix to interpolate between them. It is controlled by the `psx_bit_depth` shader global. The default value is `5` (original hardware value). `0` disables the effect.
-
-> [!NOTE]
-> This effect is applied as post process, so it will not be visible in the editor; only at runtime. But, it will apply to the entire screen.
 
 ### Fog
 
@@ -81,7 +112,18 @@ This value controls at which distance the fog should reach full transparency. Th
 
 This component recreates the effect of vertices being limited to integer screen pixels. It is controlled by the `psx_snap_distance` shader global. The default value is `1.0`. Higher values will increase the effect. `0.0` will disable the effect.
 
-## Material / Instance Shader Parameters
+
+## Materials
+
+There are a few built-in materials for use or duplication:
+
+- `mat_psx_default.tres` : Default material to showcase vertex effects. Works with Gouraud shading too.
+- `mat_psx_placeholder.tres` : Placeholder material to showcase affine texture warping.
+- `mat_psx_post_process.tres` : Built-in material to showcase bit depth reduction. DO NOT DELETE!
+- `mat_psx_shadow_32x32.tres` : Built-in material to showcase `RayShadowCaster` shadows.
+
+
+## Material Parameters
 
 This is a list of the uniform shader properties on all PSX shaders.
 

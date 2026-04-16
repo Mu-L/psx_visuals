@@ -77,7 +77,6 @@ func _enter_tree() -> void:
 		post_process_node = CanvasLayer.new()
 		post_process_node.set_script(preload("res://addons/psx_visuals/scripts/PsxAutoload.gd"))
 		get_editor_interface().get_editor_viewport_3d().add_child(post_process_node)
-		get_editor_interface().get_editor_viewport_3d().print_tree_pretty()
 
 func _disable_plugin() -> void:
 	remove_autoload_singleton(AUTOLOAD_NAME)

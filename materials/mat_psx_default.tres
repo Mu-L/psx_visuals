@@ -1,7 +1,7 @@
 [gd_resource type="ShaderMaterial" script_class="PsxMaterial3D" format=3 uid="uid://drgm0tmni178j"]
 
 [ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx_visuals/scripts/PsxMaterial3D.gd" id="1_178u1"]
-[ext_resource type="Shader" uid="uid://bggae0ebsv0bj" path="res://addons/psx_visuals/shaders/psx_t0_c0_d0.gdshader" id="1_aefgp"]
+[ext_resource type="Shader" uid="uid://bggae0ebsv0bj" path="res://addons/psx_visuals/shaders/precompile/psx_t0_c0_d0.gdshader" id="1_aefgp"]
 
 [resource]
 render_priority = 0

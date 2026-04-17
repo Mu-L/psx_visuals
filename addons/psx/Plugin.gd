@@ -1,10 +1,10 @@
-@tool class_name PsxPlugin extends EditorPlugin
+@tool class_name Psx extends EditorPlugin
 
 class PsxFileSystemContextMenuPlugin extends EditorContextMenuPlugin:
-	var plugin: PsxPlugin
+	var plugin: Psx
 
 
-	func _init(__plugin__: PsxPlugin) -> void:
+	func _init(__plugin__: Psx) -> void:
 		plugin = __plugin__
 
 
@@ -14,15 +14,90 @@ class PsxFileSystemContextMenuPlugin extends EditorContextMenuPlugin:
 
 
 class PsxSceneTreeContextMenuPlugin extends EditorContextMenuPlugin:
-	var plugin: PsxPlugin
+	var plugin: Psx
 
 
-	func _init(__plugin__: PsxPlugin) -> void:
+	func _init(__plugin__: Psx) -> void:
 		plugin = __plugin__
 
 
 	func _popup_menu(paths: PackedStringArray) -> void:
 		add_context_menu_item("Convert Node(s) to PSX...", plugin.convert_selected_nodes_context)
+
+
+#region Shader Globals
+
+const GLOBAL_VARS := {
+	&"psx_affine_strength": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
+		"type": "float",
+		"value": 1.0,
+	},
+	&"psx_bit_depth": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_UINT,
+		"type": "uint",
+		"value": 5,
+	},
+	&"psx_fog_color": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_COLOR,
+		"type": "color",
+		"value": Color(0.5, 0.5, 0.5, 0.0),
+	},
+	&"psx_fog_far": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
+		"type": "float",
+		"value": 20.0,
+	},
+	&"psx_fog_near": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
+		"type": "float",
+		"value": 10.0,
+	},
+	&"psx_snap_distance": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
+		"type": "float",
+		"value": 1.0,
+	},
+}
+
+static var affine_strength: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_affine_strength")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_affine_strength", value)
+
+static var bit_depth: int:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_bit_depth")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_bit_depth", value)
+
+static var fog_color: Color:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_color")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_color", value)
+
+static var fog_far: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_far")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_far", value)
+
+static var fog_near: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_near")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_near", value)
+
+static var snap_distance: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_snap_distance")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_snap_distance", value)
+
+
+static func touch_shader_globals() -> void:
+	for k: StringName in GLOBAL_VARS.keys():
+		var setting := "shader_globals/" + k
+		if not ProjectSettings.has_setting(setting):
+			var data: Dictionary = GLOBAL_VARS[k].duplicate()
+			RenderingServer.global_shader_parameter_add(k, data[&"rtype"], data[&"value"])
+			data.erase(&"rtype")
+			ProjectSettings.set_setting(setting, data)
+			ProjectSettings.set_initial_value(setting, data[&"value"])
+
+	ProjectSettings.save()
+
+#endregion
 
 
 const AUTOLOAD_NAME := "psx_autoload"
@@ -51,11 +126,11 @@ const CONVERSION_OPTIONS_DEFAULT := {
 
 func _enable_plugin() -> void:
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
-	Psx.touch_shader_globals()
 	PsxMaterial3D._precompile_shaders()
 
 
 func _enter_tree() -> void:
+	touch_shader_globals()
 	var command_palette := get_editor_interface().get_command_palette()
 	command_palette.add_command(CONVERT_CURRENT_SCENE_NAME, CONVERT_CURRENT_SCENE_KEY, convert_current_scene)
 	command_palette.add_command(CONVERT_SELECTED_NODE_NAME, CONVERT_SELECTED_NODE_KEY, convert_selected_nodes)
@@ -76,7 +151,7 @@ func _enter_tree() -> void:
 
 	if post_process_node == null:
 		post_process_node = CanvasLayer.new()
-		post_process_node.set_script(preload("res://addons/psx_visuals/scripts/PsxAutoload.gd"))
+		post_process_node.set_script(preload("res://addons/psx/scripts/PsxAutoload.gd"))
 		get_editor_interface().get_editor_viewport_3d().add_child(post_process_node)
 
 func _disable_plugin() -> void:

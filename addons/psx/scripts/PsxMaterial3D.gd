@@ -18,11 +18,11 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 
 #region Shader Precompilation
 
-const SHADER_TEMPLATE := preload("res://addons/psx_visuals/shaders/psx_template.gdshader")
+const SHADER_TEMPLATE := preload("res://addons/psx/shaders/psx_template.gdshader")
 const SHADER_DEFAULT_INDEX := 24
 const SHADER_CODE_INSERT_POSITION := 20 ## "shader_type spatial;\n" == 20
-const SHADER_PATH_DIR := "res://addons/psx_visuals/shaders/precompile"
-const SHADER_PATH_TEMPLATE := "res://addons/psx_visuals/shaders/precompile/psx_%04d.gdshader"
+const SHADER_PATH_DIR := "res://addons/psx/shaders/precompile"
+const SHADER_PATH_TEMPLATE := "res://addons/psx/shaders/precompile/psx_%04d.gdshader"
 const SHADER_FLAGS_ALWAYS := ["blend_mix", "diffuse_lambert", "specular_occlusion_disabled", "specular_disabled", "shadows_disabled"]
 const SHADER_FLAGS := [
 	["", "", "depth_draw_always"],
@@ -92,7 +92,7 @@ static func _static_init() -> void:
 
 		_precompile_shaders()
 
-		for material: PsxMaterial3D in PsxPlugin.get_resources(["res://"], "PsxMaterial3D"):
+		for material: PsxMaterial3D in Psx.get_resources(["res://"], "PsxMaterial3D"):
 			material.shader.materials.push_back(material)
 		# 	material._refresh_shader()
 		# 	ResourceSaver.save(material)

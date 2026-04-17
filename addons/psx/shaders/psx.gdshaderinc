@@ -88,7 +88,7 @@ void fragment() {
 	ALBEDO = albedo_final.rgb * (1.0 - fog_strength) + fog_color;
 	EMISSION += fog_color;
 #else
-	ALBEDO = albedo_color.rgb;
+	ALBEDO = albedo_final.rgb;
 #endif
 
 	ALPHA *= albedo_final.a;

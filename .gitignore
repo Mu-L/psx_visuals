@@ -1,10 +1,9 @@
-
-.DS_Store
-
 # Godot 4+ specific ignores
 .build/
 .godot/
-.vscode/
 /android/
 
-/shaders/precompile/
+/addons/psx/shaders/precompile/
+
+.vscode/
+.DS_Store

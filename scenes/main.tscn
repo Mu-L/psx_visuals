@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://bnpbxlpfbaicx"]
+
+[ext_resource type="Texture2D" uid="uid://blpwynvjwergx" path="res://icon.png" id="1_jyhfs"]
+[ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="2_tbgi4"]
+[ext_resource type="Shader" uid="uid://btoeaef2nku81" path="res://addons/psx/shaders/precompile/psx_0024.gdshader" id="3_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="3_tefeu"]
+[ext_resource type="Material" uid="uid://c5volcllr43l7" path="res://addons/psx/materials/mat_psx_placeholder.tres" id="4_o6xl0"]
+[ext_resource type="Material" uid="uid://drgm0tmni178j" path="res://addons/psx/materials/mat_psx_default.tres" id="4_tbgi4"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_o6xl0"]
+sky_material = SubResource("ProceduralSkyMaterial_tefeu")
+
+[sub_resource type="Environment" id="Environment_tipki"]
+background_mode = 2
+sky = SubResource("Sky_o6xl0")
+tonemap_mode = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_85g3d"]
+size = Vector3(10, 1, 10)
+subdivide_width = 5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_choun"]
+render_priority = 0
+shader = ExtResource("3_jyhfs")
+shader_parameter/vertex_color_use_as_albedo = false
+shader_parameter/albedo_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/alpha_scissor_threshold = 0.0
+script = ExtResource("2_tbgi4")
+vertex_color_use_as_albedo = false
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tefeu"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
+render_priority = 0
+shader = ExtResource("3_jyhfs")
+shader_parameter/vertex_color_use_as_albedo = true
+shader_parameter/albedo_texture = ExtResource("1_jyhfs")
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/alpha_scissor_threshold = 0.0
+script = ExtResource("2_tbgi4")
+albedo_texture = ExtResource("1_jyhfs")
+emission = Color(1, 1, 1, 1)
+
+[node name="Main" type="Node3D" unique_id=1699994726]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=374673350]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+light_energy = 0.25
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2115240103]
+environment = SubResource("Environment_tipki")
+
+[node name="RigidBody3D4" type="StaticBody3D" parent="." unique_id=2080832859]
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="RigidBody3D4" unique_id=476192370]
+mesh = SubResource("BoxMesh_85g3d")
+surface_material_override/0 = SubResource("ShaderMaterial_choun")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4" unique_id=1956428608]
+shape = SubResource("BoxShape3D_tefeu")
+
+[node name="silly_ball" parent="." unique_id=1375805931 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
+material = ExtResource("4_tbgi4")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+material = SubResource("ShaderMaterial_tefeu")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+material = ExtResource("4_o6xl0")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball4" parent="." unique_id=1547077677 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
+material = ExtResource("4_tbgi4")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+material = SubResource("ShaderMaterial_tefeu")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball6" parent="." unique_id=1329159422 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+material = ExtResource("4_o6xl0")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball7" parent="." unique_id=624434434 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+material = ExtResource("4_tbgi4")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+material = SubResource("ShaderMaterial_tefeu")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("3_tefeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+material = ExtResource("4_o6xl0")
+change_interval = Vector2(0.8, 1.2)
+speed_range = Vector2(10, 40)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1162836696]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 12, 21)
+fov = 20.0

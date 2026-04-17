@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx_visuals/scripts/PsxMaterial3D.gd" id="1_gtx0m"]
 [ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx_visuals/textures/shadow_32x32.png" id="2_jq7op"]
-[ext_resource type="Shader" uid="uid://dw3p73blyu8bv" path="res://addons/psx_visuals/shaders/precompile/psx_0510.gdshader" id="3_gs1pp"]
+[ext_resource type="Shader" uid="uid://bcrc406u8j6t8" path="res://addons/psx_visuals/shaders/precompile/psx_0510.gdshader" id="3_gs1pp"]
 
 [resource]
 render_priority = 0
 shader = ExtResource("3_gs1pp")
+shader_parameter/vertex_color_use_as_albedo = true
+shader_parameter/albedo_texture = ExtResource("2_jq7op")
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/alpha_scissor_threshold = 0.0
 script = ExtResource("1_gtx0m")
 transparency_mode = 2
 albedo_texture = ExtResource("2_jq7op")

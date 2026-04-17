@@ -18,6 +18,8 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 
 #region Shader Precompilation
 
+const SHADER_TEMPLATE := preload("res://addons/psx_visuals/shaders/psx_template.gdshader")
+const SHADER_DEFAULT_INDEX := 24
 const SHADER_CODE_INSERT_POSITION := 20 ## "shader_type spatial;\n" == 20
 const SHADER_PATH_DIR := "res://addons/psx_visuals/shaders/precompile"
 const SHADER_PATH_TEMPLATE := "res://addons/psx_visuals/shaders/precompile/psx_%04d.gdshader"
@@ -32,28 +34,23 @@ const SHADER_FLAGS := [
 ]
 
 static var SHADER_FLAGS_PERMUTATION_SIZES: PackedInt32Array
-static var SHADER_TABLE: Array[Shader]
+static var SHADER_TABLE: Array
 
 
 static func _precompile_shaders() -> void:
-	var template := load("res://addons/psx_visuals/shaders/psx_template.gdshader")
 	SHADER_TABLE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
 
 	var flags: PackedStringArray = SHADER_FLAGS_ALWAYS.duplicate()
-
 	for f in SHADER_FLAGS.size():
-		flags.append(SHADER_FLAGS[f][0])
+		flags.push_back(SHADER_FLAGS[f][0])
 
 	for idx in SHADER_FLAGS_PERMUTATION_SIZES[-1]:
 		for fdx in SHADER_FLAGS.size():
 			flags[fdx + SHADER_FLAGS_ALWAYS.size()] = SHADER_FLAGS[fdx][(idx / SHADER_FLAGS_PERMUTATION_SIZES[fdx] % SHADER_FLAGS[fdx].size())]
 
-		var path := SHADER_PATH_TEMPLATE % idx
-		var shader := ResourceLoader.load(path) if ResourceLoader.exists(path) else Shader.new()
-		shader.take_over_path(path)
-
 		var render_flags_string: String
 		var define_flags_string: String
+
 		for flag in flags:
 			if flag.is_empty(): continue
 			if flag.begins_with("#"):
@@ -63,10 +60,13 @@ static func _precompile_shaders() -> void:
 
 		render_flags_string = "\nrender_mode " + render_flags_string.left(-2) + ";"
 
-		shader.code = template.code.insert(SHADER_CODE_INSERT_POSITION, render_flags_string + define_flags_string)
-		ResourceSaver.save(shader)
+		var path := SHADER_PATH_TEMPLATE % idx
+		SHADER_TABLE[idx] = ResourceLoader.load(path) if ResourceLoader.exists(path) else PsxShader.new(idx)
+		if SHADER_TABLE[idx] is not PsxShader:
+			SHADER_TABLE[idx] = PsxShader.new(idx)
+		SHADER_TABLE[idx].code = SHADER_TEMPLATE.code.insert(SHADER_CODE_INSERT_POSITION, render_flags_string + define_flags_string)
+		SHADER_TABLE[idx]._refresh()
 
-		SHADER_TABLE[idx] = ResourceLoader.load(shader.resource_path)
 		idx += 1
 
 
@@ -77,8 +77,6 @@ static func _preload_shaders() -> void:
 		if not ResourceLoader.exists(path): continue
 
 		SHADER_TABLE[idx] = ResourceLoader.load(path)
-
-#endregion
 
 
 static func _static_init() -> void:
@@ -95,11 +93,14 @@ static func _static_init() -> void:
 		_precompile_shaders()
 
 		for material: PsxMaterial3D in PsxPlugin.get_resources(["res://"], "PsxMaterial3D"):
-			material._refresh_shader()
-			ResourceSaver.save(material)
+			material.shader.materials.push_back(material)
+		# 	material._refresh_shader()
+		# 	ResourceSaver.save(material)
 
 	else:
 		_preload_shaders()
+
+#endregion
 
 
 @export_subgroup("Transparency")
@@ -205,11 +206,21 @@ static func _static_init() -> void:
 func _init() -> void:
 	if not Engine.is_editor_hint(): return
 
-	shader = SHADER_TABLE[24]
+	shader = SHADER_TABLE[SHADER_DEFAULT_INDEX]
 
 
 func _refresh_shader() -> void:
+	if not Engine.is_editor_hint(): return
+
+	if shader:
+		shader.materials.erase(self )
+		shader._refresh()
+
 	shader = SHADER_TABLE[_get_shader_index()]
+
+	if not shader.materials.has(self ):
+		shader.materials.push_back(self )
+		shader._refresh()
 
 	set_shader_parameter(&"alpha_scissor_threshold", alpha_scissor_threshold if transparency_mode == 1 else 0.0)
 	set_shader_parameter(&"emission", emission)

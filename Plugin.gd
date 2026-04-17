@@ -238,11 +238,14 @@ func _convert_node_recursive(node: Node, root: Node, options: Dictionary, clear_
 func _convert_node(node: MeshInstance3D, options: Dictionary, clear_ledger := false) -> void:
 	var affected_surfaces: Dictionary[int, Material]
 	for idx in node.get_surface_override_material_count():
-		var current_mat := node.get_surface_override_material(idx)
+		var current_mat := node.material_override
 		if current_mat is PsxMaterial3D: continue
 		if current_mat == null:
-			current_mat = node.mesh.surface_get_material(idx)
-			if current_mat == null or current_mat is PsxMaterial3D: continue
+			current_mat = node.get_surface_override_material(idx)
+			if current_mat is PsxMaterial3D: continue
+			if current_mat == null:
+				current_mat = node.mesh.surface_get_material(idx)
+				if current_mat == null or current_mat is PsxMaterial3D: continue
 
 		var new_mat := convert_material(current_mat, options)
 		if new_mat == null: continue
@@ -329,7 +332,6 @@ static func get_resources(paths: Array, type: String, result: Array = []) -> Arr
 			get_resources(sub_paths, type, result)
 
 		elif path.get_extension() in valid_exts:
-			print("path : %s" % [path])
 			var resource := ResourceLoader.load(path)
 			if not resource.is_class(type): continue
 			if resource in result: continue

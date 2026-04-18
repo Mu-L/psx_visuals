@@ -25,7 +25,7 @@ const SHADER_PATH_DIR := "res://addons/psx/shaders/precompile"
 const SHADER_PATH_TEMPLATE := "res://addons/psx/shaders/precompile/psx_%04d.gdshader"
 const SHADER_FLAGS_ALWAYS := ["blend_mix", "diffuse_lambert", "specular_occlusion_disabled", "specular_disabled", "shadows_disabled"]
 const SHADER_FLAGS := [
-	["", "", "depth_draw_always"],
+	["#ALPHA_DISABLED", "depth_draw_opaque,#ALPHA_SCISSOR", "depth_draw_always"],
 	["cull_back", "cull_front", "cull_disabled"],
 	["depth_test_default", "depth_test_inverted", "depth_test_disabled"],
 	["unshaded", "", "vertex_lighting"],
@@ -53,10 +53,11 @@ static func _precompile_shaders() -> void:
 
 		for flag in flags:
 			if flag.is_empty(): continue
-			if flag.begins_with("#"):
-				define_flags_string += "\n#define " + flag.right(-1) + ";"
-			else:
-				render_flags_string += flag + ", "
+			for subflag in flag.split(","):
+				if subflag.begins_with("#"):
+					define_flags_string += "\n#define " + subflag.right(-1) + ";"
+				else:
+					render_flags_string += subflag + ", "
 
 		render_flags_string = "\nrender_mode " + render_flags_string.left(-2) + ";"
 

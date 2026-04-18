@@ -5,7 +5,9 @@
 [ext_resource type="Shader" uid="uid://bga8jictq2n2c" path="res://addons/psx/shaders/precompile/psx_0015.gdshader" id="2_tefeu"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="3_tefeu"]
 [ext_resource type="Material" uid="uid://c5volcllr43l7" path="res://addons/psx/materials/psx_mat_placeholder.tres" id="4_o6xl0"]
+[ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="4_tipki"]
 [ext_resource type="Shader" uid="uid://btoeaef2nku81" path="res://addons/psx/shaders/precompile/psx_0024.gdshader" id="5_o6xl0"]
+[ext_resource type="Shader" uid="uid://bcrc406u8j6t8" path="res://addons/psx/shaders/precompile/psx_0510.gdshader" id="5_tipki"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -17,7 +19,9 @@ sky_material = SubResource("ProceduralSkyMaterial_tefeu")
 [sub_resource type="Environment" id="Environment_tipki"]
 background_mode = 2
 sky = SubResource("Sky_o6xl0")
-tonemap_mode = 2
+tonemap_mode = 4
+tonemap_exposure = 2.0
+tonemap_agx_white = 16.5
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_tefeu"]
 size = Vector2(10, 10)
@@ -27,13 +31,24 @@ render_priority = 0
 shader = ExtResource("2_tefeu")
 shader_parameter/u_vertex_color_use_as_albedo = false
 shader_parameter/u_albedo_color = Color(0.4, 0.4, 0.4, 1)
-shader_parameter/u_alpha_scissor_threshold = 0.0
 script = ExtResource("2_tbgi4")
 shading_mode = 1
 vertex_color_use_as_albedo = false
 albedo_color = Color(0.4, 0.4, 0.4, 1)
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_85g3d"]
+render_priority = 0
+shader = ExtResource("5_tipki")
+shader_parameter/u_vertex_color_use_as_albedo = false
+shader_parameter/u_albedo_texture = ExtResource("4_tipki")
+shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
+script = ExtResource("2_tbgi4")
+transparency_mode = 2
+vertex_color_use_as_albedo = false
+albedo_texture = ExtResource("4_tipki")
+metadata/_custom_type_script = "uid://cb12verrfoj5k"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
 render_priority = 0
@@ -60,7 +75,7 @@ func _process(delta: float) -> void:
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=374673350]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-visible = false
+light_energy = 0.25
 shadow_enabled = true
 directional_shadow_mode = 0
 directional_shadow_pancake_size = 266.8
@@ -83,7 +98,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
 
 [node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-material = SubResource("ShaderMaterial_tefeu")
+material = SubResource("ShaderMaterial_85g3d")
 
 [node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
@@ -95,7 +110,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
 [node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
 material = SubResource("ShaderMaterial_tefeu")
-precision_uv = 0.5
 precision_xy = 0.5
 precision_z = 0.5
 precision_all = 0.5

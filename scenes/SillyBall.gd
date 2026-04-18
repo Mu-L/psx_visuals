@@ -7,6 +7,34 @@
 
 		$mesh.material_override = value
 
+@export var precision_uv: float = 1.0:
+	set(value):
+		precision_uv = value
+		if not is_node_ready(): return
+
+		$mesh.set_instance_shader_parameter(&"i_precision_uv", precision_uv)
+
+@export var precision_xy: float = 1.0:
+	set(value):
+		precision_xy = value
+		if not is_node_ready(): return
+
+		$mesh.set_instance_shader_parameter(&"i_precision_xy", precision_xy)
+
+@export var precision_z: float = 1.0:
+	set(value):
+		precision_z = value
+		if not is_node_ready(): return
+
+		$mesh.set_instance_shader_parameter(&"i_precision_z", precision_z)
+
+@export var precision_all: float = 1.0:
+	set(value):
+		precision_all = value
+		precision_uv = value
+		precision_xy = value
+		precision_z = value
+
 @export var target_position: Vector3
 @export var change_interval := Vector2(0.5, 2.0)
 @export var speed_range := Vector2(0.5, 2.0)
@@ -29,6 +57,7 @@ func _init() -> void:
 
 func _ready() -> void:
 	$mesh.material_override = material
+	$mesh.set_instance_shader_parameter(&"i_precision_xy", precision_xy)
 
 
 func _physics_process(_delta: float) -> void:

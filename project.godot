@@ -17,12 +17,11 @@ config/icon="res://icon.png"
 
 [autoload]
 
-myth_ghost_autoload="*uid://cxbnm6qp5683r"
 psx_autoload="*uid://u3y0jxl0vtmg"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/myth/modules/base/plugin.cfg", "res://addons/myth/modules/ghost/plugin.cfg", "res://addons/psx/plugin.cfg")
+enabled=PackedStringArray("res://addons/psx/plugin.cfg")
 
 [input]
 
@@ -145,7 +144,15 @@ psx_fog_near={
 "type": "float",
 "value": 10.0
 }
-psx_snap_distance={
+psx_precision_uv={
 "type": "float",
-"value": 1.0
+"value": 128.0
+}
+psx_precision_xy={
+"type": "float",
+"value": 256.0
+}
+psx_precision_z={
+"type": "float",
+"value": 512.0
 }

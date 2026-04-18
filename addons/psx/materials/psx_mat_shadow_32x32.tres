@@ -7,10 +7,10 @@
 [resource]
 render_priority = 0
 shader = ExtResource("3_gs1pp")
-shader_parameter/vertex_color_use_as_albedo = true
-shader_parameter/albedo_texture = ExtResource("2_jq7op")
-shader_parameter/albedo_color = Color(1, 1, 1, 1)
-shader_parameter/alpha_scissor_threshold = 0.0
+shader_parameter/u_vertex_color_use_as_albedo = true
+shader_parameter/u_albedo_texture = ExtResource("2_jq7op")
+shader_parameter/u_albedo_color = Color(1, 1, 1, 0.5019608)
 script = ExtResource("1_gtx0m")
 transparency_mode = 2
 albedo_texture = ExtResource("2_jq7op")
+albedo_color = Color(1, 1, 1, 0.5019608)

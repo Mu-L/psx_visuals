@@ -5,9 +5,8 @@
 [ext_resource type="Shader" uid="uid://bga8jictq2n2c" path="res://addons/psx/shaders/precompile/psx_0015.gdshader" id="2_tefeu"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="3_tefeu"]
 [ext_resource type="Material" uid="uid://c5volcllr43l7" path="res://addons/psx/materials/psx_mat_placeholder.tres" id="4_o6xl0"]
-[ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="4_tipki"]
+[ext_resource type="Material" uid="uid://dueuwdraosbov" path="res://addons/psx/materials/psx_mat_shadow_32x32.tres" id="4_tipki"]
 [ext_resource type="Shader" uid="uid://btoeaef2nku81" path="res://addons/psx/shaders/precompile/psx_0024.gdshader" id="5_o6xl0"]
-[ext_resource type="Shader" uid="uid://bcrc406u8j6t8" path="res://addons/psx/shaders/precompile/psx_0510.gdshader" id="5_tipki"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -37,18 +36,6 @@ vertex_color_use_as_albedo = false
 albedo_color = Color(0.4, 0.4, 0.4, 1)
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_85g3d"]
-render_priority = 0
-shader = ExtResource("5_tipki")
-shader_parameter/u_vertex_color_use_as_albedo = false
-shader_parameter/u_albedo_texture = ExtResource("4_tipki")
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-script = ExtResource("2_tbgi4")
-transparency_mode = 2
-vertex_color_use_as_albedo = false
-albedo_texture = ExtResource("4_tipki")
-metadata/_custom_type_script = "uid://cb12verrfoj5k"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
 render_priority = 0
@@ -98,7 +85,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
 
 [node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-material = SubResource("ShaderMaterial_85g3d")
+material = ExtResource("4_tipki")
 
 [node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)

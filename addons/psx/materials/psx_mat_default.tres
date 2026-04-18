@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" script_class="PsxMaterial3D" format=3 uid="uid://drgm0tmni178j"]
+
+[ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="1_n74or"]
+[ext_resource type="Shader" uid="uid://bga8jictq2n2c" path="res://addons/psx/shaders/precompile/psx_0015.gdshader" id="2_2uxil"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("2_2uxil")
+shader_parameter/u_vertex_color_use_as_albedo = true
+shader_parameter/u_albedo_color = Color(0, 0.30800003, 0.66, 1)
+shader_parameter/u_alpha_scissor_threshold = 0.0
+script = ExtResource("1_n74or")
+shading_mode = 1
+albedo_color = Color(0, 0.30800003, 0.66, 1)
+emission = Color(1, 1, 1, 1)

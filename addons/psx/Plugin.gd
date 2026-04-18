@@ -53,10 +53,20 @@ const GLOBAL_VARS := {
 		"type": "float",
 		"value": 10.0,
 	},
-	&"psx_snap_distance": {
+	&"psx_precision_uv": {
 		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
 		"type": "float",
-		"value": 1.0,
+		"value": 128.0,
+	},
+	&"psx_precision_xy": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
+		"type": "float",
+		"value": 256.0,
+	},
+	&"psx_precision_z": {
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_FLOAT,
+		"type": "float",
+		"value": 512.0,
 	},
 }
 
@@ -80,9 +90,17 @@ static var fog_near: float:
 	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_near")
 	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_near", value)
 
-static var snap_distance: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_snap_distance")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_snap_distance", value)
+static var precision_uv: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_uv")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_precision_uv", value)
+
+static var precision_xy: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_xy")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_precision_xy", value)
+
+static var precision_z: float:
+	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_z")
+	set(value): RenderingServer.global_shader_parameter_set(&"psx_precision_z", value)
 
 
 static func touch_shader_globals() -> void:

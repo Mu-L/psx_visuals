@@ -34,12 +34,12 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	if Engine.is_editor_hint(): return
 
-	var direction := Myth.flatten(target_position - global_position, true)
+	var direction := ((target_position - global_position) * (Vector3.ONE - Vector3.UP)).normalized()
 	direction = direction.rotated(Vector3.UP, current_angle)
 	apply_central_force(direction * current_speed * mass)
 
 
 func _change_speed() -> void:
 	timer.wait_time = randf_range(change_interval.x, change_interval.y)
-	current_speed = randf_range(speed_range.x, speed_range.y) if current_speed == 0.0 else 0.0
+	current_speed = minf(global_position.distance_to(target_position), speed_range.y) * randf_range(speed_range.x, speed_range.y) if current_speed == 0.0 else 0.0
 	current_angle = deg_to_rad(randf_range(-5, 5))

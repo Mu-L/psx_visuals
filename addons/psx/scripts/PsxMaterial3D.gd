@@ -149,19 +149,19 @@ static func _static_init() -> void:
 @export var vertex_color_use_as_albedo: bool = true:
 	set(value):
 		vertex_color_use_as_albedo = value
-		set_shader_parameter(&"vertex_color_use_as_albedo", vertex_color_use_as_albedo)
+		set_shader_parameter(&"u_vertex_color_use_as_albedo", vertex_color_use_as_albedo)
 
 
 @export var albedo_texture: Texture2D = null:
 	set(value):
 		albedo_texture = value
-		set_shader_parameter(&"albedo_texture", albedo_texture)
+		set_shader_parameter(&"u_albedo_texture", albedo_texture)
 
 
 @export var albedo_color: Color = Color.WHITE:
 	set(value):
 		albedo_color = value
-		set_shader_parameter(&"albedo_color", albedo_color)
+		set_shader_parameter(&"u_albedo_color", albedo_color)
 
 
 @export_subgroup("Emission", "emission_")
@@ -176,13 +176,13 @@ static func _static_init() -> void:
 @export_color_no_alpha var emission: Color = Color.BLACK:
 	set(value):
 		emission = value
-		set_shader_parameter(&"emission", emission)
+		set_shader_parameter(&"u_emission", emission)
 
 
 @export_range(0.0, 16.0, 0.01, "or_greater") var emission_energy_multiplier: float = 1.0:
 	set(value):
 		emission_energy_multiplier = value
-		set_shader_parameter(&"emission_energy_multiplier", emission_energy_multiplier)
+		set_shader_parameter(&"u_emission_energy_multiplier", emission_energy_multiplier)
 
 
 @export_enum("Add", "Multiply") var emission_operator: int = BaseMaterial3D.EmissionOperator.EMISSION_OP_ADD:
@@ -194,13 +194,13 @@ static func _static_init() -> void:
 @export var emission_on_uv2: bool = false:
 	set(value):
 		emission_on_uv2 = value
-		set_shader_parameter(&"emission_on_uv2", emission_on_uv2)
+		set_shader_parameter(&"u_emission_on_uv2", emission_on_uv2)
 
 
 @export var emission_texture: Texture2D = null:
 	set(value):
 		emission_texture = value
-		set_shader_parameter(&"emission_texture", emission_texture)
+		set_shader_parameter(&"u_emission_texture", emission_texture)
 
 
 func _init() -> void:
@@ -222,12 +222,12 @@ func _refresh_shader() -> void:
 		shader.materials.push_back(self )
 		shader._refresh()
 
-	set_shader_parameter(&"alpha_scissor_threshold", alpha_scissor_threshold if transparency_mode == 1 else 0.0)
-	set_shader_parameter(&"emission", emission)
-	set_shader_parameter(&"emission_energy_multiplier", emission_energy_multiplier)
-	set_shader_parameter(&"emission_operator", emission_operator)
-	set_shader_parameter(&"emission_on_uv2", emission_on_uv2)
-	set_shader_parameter(&"emission_texture", emission_texture)
+	set_shader_parameter(&"u_alpha_scissor_threshold", alpha_scissor_threshold if transparency_mode == 1 else 0.0)
+	set_shader_parameter(&"u_emission", emission)
+	set_shader_parameter(&"u_emission_energy_multiplier", emission_energy_multiplier)
+	set_shader_parameter(&"u_emission_operator", emission_operator)
+	set_shader_parameter(&"u_emission_on_uv2", emission_on_uv2)
+	set_shader_parameter(&"u_emission_texture", emission_texture)
 
 
 func _get_shader_index() -> int:

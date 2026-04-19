@@ -13,6 +13,7 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 	&"emission_operator",
 	&"emission_on_uv2",
 	&"emission_texture",
+	&"billboard_mode",
 ]
 
 
@@ -31,6 +32,7 @@ const SHADER_FLAGS := [
 	["unshaded", "", "vertex_lighting"],
 	["fog_disabled", "", "#VERTEX_FOG_ENABLED"],
 	["", "#EMISSION_ADD", "#EMISSION_MULTIPLY"],
+	["", "#BILLBOARD_FULL", "#BILLBOARD_FIXED_Y"],
 ]
 
 static var SHADER_FLAGS_PERMUTATION_SIZES: PackedInt32Array
@@ -38,6 +40,9 @@ static var SHADER_TABLE: Array
 
 
 static func _precompile_shaders() -> void:
+	if not DirAccess.dir_exists_absolute(SHADER_PATH_DIR):
+		DirAccess.make_dir_recursive_absolute(SHADER_PATH_DIR)
+
 	SHADER_TABLE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
 
 	var flags: PackedStringArray = SHADER_FLAGS_ALWAYS.duplicate()
@@ -204,6 +209,16 @@ static func _static_init() -> void:
 		set_shader_parameter(&"u_emission_texture", emission_texture)
 
 
+@export_subgroup("Billboard", "billboard_")
+
+
+@export var billboard_mode: BaseMaterial3D.BillboardMode:
+	set(value):
+		## Currently unsure what BILLBOARD_PARTICLES does or how to implement.
+		billboard_mode = BaseMaterial3D.BillboardMode.BILLBOARD_ENABLED if value == BaseMaterial3D.BillboardMode.BILLBOARD_PARTICLES else value
+		_refresh_shader()
+
+
 func _init() -> void:
 	if not Engine.is_editor_hint(): return
 
@@ -233,10 +248,11 @@ func _refresh_shader() -> void:
 
 func _get_shader_index() -> int:
 	return (
-		+ transparency_mode * 243
-		+ cull_mode * 81
-		+ depth_test * 27
-		+ shading_mode * 9
-		+ fog_mode * 3
-		+ (emission_operator + 1 if emission_enabled else 0)
+		+ transparency_mode * 729
+		+ cull_mode * 243
+		+ depth_test * 81
+		+ shading_mode * 27
+		+ fog_mode * 9
+		+ (emission_operator + 1 if emission_enabled else 0) * 3
+		+ billboard_mode
 	)

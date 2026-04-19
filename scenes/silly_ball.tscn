@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://j6si3eotee6o" path="res://scenes/SillyBall.gd" id="1_etg74"]
 [ext_resource type="Material" uid="uid://drgm0tmni178j" path="res://addons/psx/materials/psx_mat_default.tres" id="2_txpge"]
+[ext_resource type="Script" uid="uid://bq5vw344iydkr" path="res://addons/psx/scripts/RayShadowCaster.gd" id="3_etg74"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_o5qli"]
 radial_segments = 8
@@ -25,3 +26,9 @@ mesh = SubResource("SphereMesh_o5qli")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=259735888]
 shape = SubResource("SphereShape3D_tbgi4")
+
+[node name="RayShadowCaster" type="RayCast3D" parent="." unique_id=88764924]
+target_position = Vector3(0, -10, 0)
+script = ExtResource("3_etg74")
+margin = 1.0
+metadata/_custom_type_script = "uid://bq5vw344iydkr"

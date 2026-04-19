@@ -1,6 +1,3 @@
-//#define BILLBOARD_DISABLED;
-//#define BILLBOARD_Z;
-#define BILLBOARD_Y;
 
 global uniform float psx_affine_strength;
 global uniform float psx_precision_uv;
@@ -49,23 +46,20 @@ varying vec3 v_fog_color;
 
 void vertex() {
     v_vertex_color = COLOR.rgb;
-	
-#if defined BILLBOARD_Z
-	MODELVIEW_MATRIX = MODEL_MATRIX * mat4(
-		vec4(1.0, 0.0, 0.0, 0.0),
-		vec4(0.0, 1.0, 0.0, 0.0),
-		vec4(0.0, 0.0, 1.0, 0.0),
-		VIEW_MATRIX[3]
+
+#if defined BILLBOARD_FULL
+	MODELVIEW_MATRIX = mat4(
+		vec4(length(MODELVIEW_MATRIX[0].xyz), 0.0, 0.0, 0.0),
+		vec4(0.0, length(MODELVIEW_MATRIX[1].xyz), 0.0, 0.0),
+		vec4(0.0, 0.0, length(MODELVIEW_MATRIX[2].xyz), 0.0),
+		MODELVIEW_MATRIX[3]
 	);
-#elif defined BILLBOARD_Y
-	MODELVIEW_MATRIX = MODEL_MATRIX * mat4(
-		//VIEW_MATRIX[0],
-		vec4(1.0, 0.0, 0.0, 0.0),
-		//vec4(0.0, 1.0, 0.0, 0.0),
-		VIEW_MATRIX[1],
-		//vec4(0.0, 0.0, 1.0, 0.0),
-		VIEW_MATRIX[2],
-		VIEW_MATRIX[3]
+#elif defined BILLBOARD_FIXED_Y
+	MODELVIEW_MATRIX = mat4(
+		vec4(length(MODELVIEW_MATRIX[0].xyz), 0.0, 0.0, 0.0),
+		MODELVIEW_MATRIX[1],
+		vec4(cross(vec3(1.0, 0.0, 0.0), MODELVIEW_MATRIX[1].xyz), 0.0),
+		MODELVIEW_MATRIX[3]
 	);
 #endif
 

@@ -19,6 +19,12 @@ config/icon="res://icon.png"
 
 psx_autoload="*uid://u3y0jxl0vtmg"
 
+[display]
+
+window/stretch/mode="viewport"
+window/stretch/scale=2.0
+window/stretch/scale_mode="integer"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/psx/plugin.cfg")
@@ -150,7 +156,7 @@ psx_precision_uv={
 }
 psx_precision_xy={
 "type": "float",
-"value": 256.0
+"value": 128.0
 }
 psx_precision_z={
 "type": "float",

@@ -8,6 +8,7 @@ func _init() -> void:
 	layer = POST_PROCESS_LAYER if not Engine.is_editor_hint() else RenderingServer.CANVAS_LAYER_MIN
 
 	var color_rect := ColorRect.new()
+	color_rect.color = Color.BLACK
 	color_rect.material = POST_PROCESS_MATERIAL
 	color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	color_rect.focus_mode = Control.FOCUS_NONE

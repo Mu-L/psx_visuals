@@ -1,3 +1,7 @@
+//#define BILLBOARD_DISABLED;
+//#define BILLBOARD_Z;
+#define BILLBOARD_Y;
+
 global uniform float psx_affine_strength;
 global uniform float psx_precision_uv;
 global uniform float psx_precision_xy;
@@ -21,13 +25,12 @@ varying vec2 v_uv2;
 uniform float u_alpha_scissor_threshold: hint_range(0.0, 1.0, 0.01) = 0.5;
 #endif
 
-#ifdef EMISSION_ADD
+#if defined EMISSION_ADD
 uniform vec3 u_emission: source_color = vec3(0.0, 0.0, 0.0);
 uniform float u_emission_energy_multiplier = 1.0;
 uniform bool u_emission_on_uv2 = false;
 uniform sampler2D u_emission_texture: hint_default_white, filter_nearest;
-#endif
-#ifdef EMISSION_MULTIPLY
+#elif defined EMISSION_MULTIPLY
 uniform vec3 u_emission: source_color = vec3(0.0, 0.0, 0.0);
 uniform float u_emission_energy_multiplier = 1.0;
 uniform bool u_emission_on_uv2 = false;
@@ -46,6 +49,25 @@ varying vec3 v_fog_color;
 
 void vertex() {
     v_vertex_color = COLOR.rgb;
+	
+#if defined BILLBOARD_Z
+	MODELVIEW_MATRIX = MODEL_MATRIX * mat4(
+		vec4(1.0, 0.0, 0.0, 0.0),
+		vec4(0.0, 1.0, 0.0, 0.0),
+		vec4(0.0, 0.0, 1.0, 0.0),
+		VIEW_MATRIX[3]
+	);
+#elif defined BILLBOARD_Y
+	MODELVIEW_MATRIX = MODEL_MATRIX * mat4(
+		//VIEW_MATRIX[0],
+		vec4(1.0, 0.0, 0.0, 0.0),
+		//vec4(0.0, 1.0, 0.0, 0.0),
+		VIEW_MATRIX[1],
+		//vec4(0.0, 0.0, 1.0, 0.0),
+		VIEW_MATRIX[2],
+		VIEW_MATRIX[3]
+	);
+#endif
 
 	vec2 viewport_ratio = VIEWPORT_SIZE / VIEWPORT_SIZE.y;
 	float precision_xy = psx_precision_xy * i_precision_xy;
@@ -91,18 +113,17 @@ void fragment() {
 		albedo *= vec4(v_vertex_color, 1.0);
 	}
 
-#ifndef ALPHA_DISABLED
+#if !defined ALPHA_DISABLED
 	ALPHA = albedo.a;
 #endif
 #ifdef ALPHA_SCISSOR
 	ALPHA_SCISSOR_THRESHOLD = u_alpha_scissor_threshold;
 #endif
 
-#ifdef EMISSION_ADD
+#if defined EMISSION_ADD
 	vec3 emission = texture(u_emission_texture, u_emission_on_uv2 ? uv2 : uv).rgb + u_emission;
 	EMISSION = emission * u_emission_energy_multiplier;
-#endif
-#ifdef EMISSION_MULTIPLY
+#elif defined EMISSION_MULTIPLY
 	vec3 emission = texture(u_emission_texture, u_emission_on_uv2 ? uv2 : uv).rgb * u_emission;
 	EMISSION = emission * u_emission_energy_multiplier;
 #endif

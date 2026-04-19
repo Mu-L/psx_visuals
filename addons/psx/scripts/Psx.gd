@@ -126,8 +126,8 @@ const CONVERT_SELECTED_NODE_NAME := "Convert Selected Node(s) to PSX..."
 const CONVERT_SELECTED_NODE_KEY := "psx/convert_selected_node"
 const CONVERT_ENTIRE_PROJECT_NAME := "Convert Entire Project to PSX..."
 const CONVERT_ENTIRE_PROJECT_KEY := "psx/convert_entire_project"
-const PRECOMPILE_SHADERS_NAME := "Precompile PSX Shaders"
-const PRECOMPILE_SHADERS_KEY := "psx/precompile_shaders"
+const PURGE_SHADERS_NAME := "Purge Unused Shaders"
+const PURGE_SHADERS_KEY := "psx/purge_unused_shaders"
 
 
 var file_system_context_menu_plugin: PsxFileSystemContextMenuPlugin
@@ -144,7 +144,6 @@ const CONVERSION_OPTIONS_DEFAULT := {
 
 func _enable_plugin() -> void:
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
-	PsxMaterial3D._precompile_shaders()
 
 
 func _enter_tree() -> void:
@@ -153,7 +152,7 @@ func _enter_tree() -> void:
 	command_palette.add_command(CONVERT_CURRENT_SCENE_NAME, CONVERT_CURRENT_SCENE_KEY, convert_current_scene)
 	command_palette.add_command(CONVERT_SELECTED_NODE_NAME, CONVERT_SELECTED_NODE_KEY, convert_selected_nodes)
 	command_palette.add_command(CONVERT_ENTIRE_PROJECT_NAME, CONVERT_ENTIRE_PROJECT_KEY, convert_entire_project)
-	command_palette.add_command(PRECOMPILE_SHADERS_NAME, PRECOMPILE_SHADERS_KEY, PsxMaterial3D._precompile_shaders)
+	command_palette.add_command(PURGE_SHADERS_NAME, PURGE_SHADERS_KEY, PsxMaterial3D.purge_unused_shaders)
 
 	if file_system_context_menu_plugin == null:
 		file_system_context_menu_plugin = PsxFileSystemContextMenuPlugin.new(self )
@@ -181,7 +180,7 @@ func _exit_tree() -> void:
 	command_palette.remove_command(CONVERT_CURRENT_SCENE_KEY)
 	command_palette.remove_command(CONVERT_SELECTED_NODE_KEY)
 	command_palette.remove_command(CONVERT_ENTIRE_PROJECT_KEY)
-	command_palette.remove_command(PRECOMPILE_SHADERS_KEY)
+	command_palette.remove_command(PURGE_SHADERS_KEY)
 
 	if file_system_context_menu_plugin != null:
 		remove_context_menu_plugin(file_system_context_menu_plugin)

@@ -2,11 +2,12 @@
 
 [ext_resource type="Texture2D" uid="uid://blpwynvjwergx" path="res://icon.png" id="1_jyhfs"]
 [ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="2_tbgi4"]
-[ext_resource type="Script" uid="uid://cav2u8csjnuhn" path="res://addons/psx/scripts/PsxShader.gd" id="2_tipki"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="3_tefeu"]
+[ext_resource type="Shader" uid="uid://fxrl2si3e5u6" path="res://addons/psx/shaders/cache/psx_00072.gdshader" id="3_tipki"]
 [ext_resource type="Material" uid="uid://c5volcllr43l7" path="res://addons/psx/materials/psx_mat_placeholder.tres" id="4_o6xl0"]
 [ext_resource type="Material" uid="uid://dueuwdraosbov" path="res://addons/psx/materials/psx_mat_shadow_32x32.tres" id="4_tipki"]
-[ext_resource type="Shader" uid="uid://vq4v7tkdbett" path="res://addons/psx/shaders/precompile/psx_0560.gdshader" id="7_tipki"]
+[ext_resource type="Shader" uid="uid://cn71f2fmwr2hb" path="res://addons/psx/shaders/cache/psx_00080.gdshader" id="7_tipki"]
+[ext_resource type="Shader" uid="uid://ch1of3igp45h6" path="res://addons/psx/shaders/cache/psx_00558.gdshader" id="8_choun"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -27,42 +28,39 @@ size = Vector2(10, 10)
 subdivide_width = 3
 subdivide_depth = 3
 
-[sub_resource type="Shader" id="Shader_tipki"]
-code = "shader_type spatial;
-render_mode blend_mix, diffuse_lambert, specular_occlusion_disabled, specular_disabled, shadows_disabled, cull_back, depth_test_default, unshaded;
-#define ALPHA_DISABLED;
-#define VERTEX_FOG_ENABLED;
-#define EMISSION_MULTIPLY;
-
-#include \"res://addons/psx/shaders/psx.gdshaderinc\"
-"
-script = ExtResource("2_tipki")
-table_index = 24
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_85g3d"]
 render_priority = 0
-shader = SubResource("Shader_tipki")
+shader = ExtResource("3_tipki")
 shader_parameter/u_vertex_color_use_as_albedo = true
 shader_parameter/u_albedo_texture = ExtResource("1_jyhfs")
 shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-shader_parameter/u_emission = Color(0, 0, 0, 1)
-shader_parameter/u_emission_energy_multiplier = 1.0
-shader_parameter/u_emission_on_uv2 = false
 script = ExtResource("2_tbgi4")
 albedo_texture = ExtResource("1_jyhfs")
 metadata/_custom_type_script = "uid://cb12verrfoj5k"
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_choun"]
+render_priority = 0
+shader = ExtResource("7_tipki")
+shader_parameter/u_vertex_color_use_as_albedo = true
+shader_parameter/u_albedo_color = Color(0, 0.30800003, 0.66, 1)
+shader_parameter/u_emission = Color(0, 0.4666667, 1, 1)
+shader_parameter/u_emission_energy_multiplier = 1.0
+shader_parameter/u_emission_on_uv2 = false
+script = ExtResource("2_tbgi4")
+albedo_color = Color(0, 0.30800003, 0.66, 1)
+emission_enabled = true
+emission = Color(0, 0.4666667, 1, 1)
+emission_operator = 1
+billboard_mode = 2
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
 render_priority = 0
-shader = SubResource("Shader_tipki")
+shader = ExtResource("3_tipki")
 shader_parameter/u_vertex_color_use_as_albedo = true
 shader_parameter/u_albedo_texture = ExtResource("1_jyhfs")
 shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-shader_parameter/u_emission = Color(1, 1, 1, 1)
-shader_parameter/u_emission_energy_multiplier = 1.0
-shader_parameter/u_emission_on_uv2 = false
 script = ExtResource("2_tbgi4")
 albedo_texture = ExtResource("1_jyhfs")
 emission = Color(1, 1, 1, 1)
@@ -81,28 +79,17 @@ func _process(delta: float) -> void:
 radial_segments = 8
 rings = 3
 
-[sub_resource type="Gradient" id="Gradient_o6xl0"]
-offsets = PackedFloat32Array(0, 0.5, 0.6290107)
-colors = PackedColorArray(0, 0, 0.5019608, 1, 0.82, 0.81289333, 0.6068, 1, 0, 0.12433155, 0.5638828, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_tipki"]
-gradient = SubResource("Gradient_o6xl0")
-width = 1
-fill_from = Vector2(0, 1)
-fill_to = Vector2(0, 0)
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ya4ey"]
 render_priority = 0
-shader = ExtResource("7_tipki")
+shader = ExtResource("8_choun")
 shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_texture = SubResource("GradientTexture2D_tipki")
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
+shader_parameter/u_albedo_texture = ExtResource("1_jyhfs")
+shader_parameter/u_albedo_color = Color(0.49, 0.49, 0.49, 1)
 script = ExtResource("2_tbgi4")
 cull_mode = 2
 albedo_texture = ExtResource("1_jyhfs")
 albedo_color = Color(0.49, 0.49, 0.49, 1)
 emission = Color(1, 1, 1, 1)
-billboard_mode = 2
 
 [node name="Main" type="Node3D" unique_id=1699994726]
 
@@ -137,6 +124,7 @@ material = ExtResource("4_o6xl0")
 
 [node name="silly_ball4" parent="." unique_id=1547077677 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
+material = SubResource("ShaderMaterial_choun")
 
 [node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("3_tefeu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
@@ -180,8 +168,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.881119, 3, 3.369406)
 transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.5850001, 0, 3, 4)
 
 [node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
-transform = Transform3D(4000, 0, 0, 0, 4000, 0, 0, 0, 4000, 0, -1, 0)
-instance_shader_parameters/i_precision_xy = 1.0
+transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, -0.9999995, 0)
 mesh = SubResource("SphereMesh_choun")
 surface_material_override/0 = SubResource("ShaderMaterial_ya4ey")
-metadata/_edit_lock_ = true

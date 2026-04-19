@@ -3,7 +3,7 @@
 .godot/
 /android/
 
-/addons/psx/shaders/precompile/
+/addons/psx/shaders/cache/
 
 .vscode/
 .DS_Store

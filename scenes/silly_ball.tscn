@@ -28,7 +28,9 @@ mesh = SubResource("SphereMesh_o5qli")
 shape = SubResource("SphereShape3D_tbgi4")
 
 [node name="RayShadowCaster" type="RayCast3D" parent="." unique_id=88764924]
-target_position = Vector3(0, -10, 0)
+visible = false
+target_position = Vector3(0, -5, 0)
+hit_back_faces = false
 script = ExtResource("3_etg74")
 margin = 1.0
 metadata/_custom_type_script = "uid://bq5vw344iydkr"

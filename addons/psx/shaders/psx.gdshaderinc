@@ -108,10 +108,10 @@ void fragment() {
 	}
 
 #if !defined ALPHA_DISABLED
-	ALPHA = albedo.a;
-#endif
-#ifdef ALPHA_SCISSOR
+	ALPHA *= albedo.a;
+#if defined ALPHA_SCISSOR
 	ALPHA_SCISSOR_THRESHOLD = u_alpha_scissor_threshold;
+#endif
 #endif
 
 #if defined EMISSION_ADD

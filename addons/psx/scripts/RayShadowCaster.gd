@@ -1,4 +1,4 @@
-class_name RayShadowCaster extends RayCast3D
+@tool class_name RayShadowCaster extends RayCast3D
 
 static var shadow_quad: QuadMesh
 static func _static_init() -> void:
@@ -29,7 +29,7 @@ func _init() -> void:
 	mesh = MeshInstance3D.new()
 	mesh.mesh = shadow_quad
 	mesh.material_override = _material_override
-	add_child(mesh)
+	add_child(mesh, false, INTERNAL_MODE_BACK)
 
 
 func _process(delta: float) -> void:
@@ -42,7 +42,5 @@ func _process(delta: float) -> void:
 
 	mesh.global_position = get_collision_point() + get_collision_normal() * margin
 	mesh.global_basis.z = - get_collision_normal()
-	# mesh.global_basis.y.x = 1.0 / mesh.global_basis.z.dot(Vector3.RIGHT)
-	# mesh.global_basis.y.y = 1.0 / mesh.global_basis.z.dot(Vector3.FORWARD)
 	mesh.transparency = collision_percent if fade_with_distance else 0.0
 	mesh.scale = Vector3.ONE * (1.0 - (collision_percent if scale_with_distance else 0.0))

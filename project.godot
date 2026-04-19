@@ -156,7 +156,7 @@ psx_precision_uv={
 }
 psx_precision_xy={
 "type": "float",
-"value": 128.0
+"value": 256.0
 }
 psx_precision_z={
 "type": "float",

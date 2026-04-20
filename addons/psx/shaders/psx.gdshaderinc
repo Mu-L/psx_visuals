@@ -54,6 +54,12 @@ void vertex() {
 		vec4(0.0, 0.0, length(MODELVIEW_MATRIX[2].xyz), 0.0),
 		MODELVIEW_MATRIX[3]
 	);
+	MODELVIEW_NORMAL_MATRIX = mat3(
+		vec3(1.0, 0.0, 0.0),
+		vec3(0.0, 1.0, 0.0),
+		vec3(0.0, 0.0, 1.0)
+	);
+
 #elif defined BILLBOARD_FIXED_Y
 	MODELVIEW_MATRIX = mat4(
 		vec4(length(MODELVIEW_MATRIX[0].xyz), 0.0, 0.0, 0.0),

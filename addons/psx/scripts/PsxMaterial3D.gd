@@ -20,7 +20,6 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 #region Shader Compilation
 
 const SHADER_TEMPLATE := preload("res://addons/psx/shaders/psx_template.gdshader")
-const SHADER_DEFAULT_INDEX := 72
 const SHADER_CODE_INSERT_POSITION := 20 ## "shader_type spatial;\n" == 20
 const SHADER_CACHE_DIR := "res://addons/psx/shaders/cache"
 const SHADER_PATH_TEMPLATE := "res://addons/psx/shaders/cache/psx_%05d.gdshader"
@@ -32,42 +31,61 @@ const SHADER_FLAGS := [
 	["unshaded", "", "vertex_lighting"],
 	["fog_disabled", "", "#VERTEX_FOG_ENABLED"],
 	["", "#EMISSION_ADD", "#EMISSION_MULTIPLY"],
-	["", "#BILLBOARD_FULL", "#BILLBOARD_FIXED_Y"],
+	[
+		"#BILLBOARD_DISABLED",
+		"#BILLBOARD_ENABLED",
+		"#BILLBOARD_ENABLED,#BILLBOARD_KEEP_SCALE",
+		"#BILLBOARD_FIXED_Y",
+		"#BILLBOARD_FIXED_Y,#BILLBOARD_KEEP_SCALE",
+		"#BILLBOARD_PARTICLES",
+		"#BILLBOARD_PARTICLES,#BILLBOARD_KEEP_SCALE",
+	],
 ]
 
+static var SHADER_DEFAULT_INDEX := 168
 static var SHADER_FLAGS_PERMUTATION_SIZES: PackedInt32Array
 static var SHADER_FLAGS_CACHE: PackedStringArray
-static var SHADER_CACHE: Array
+static var SHADER_CACHE: Dictionary[int, Shader]
 
 
 static func touch_shader(idx: int) -> Shader:
-	if SHADER_CACHE[idx] == null:
+	if not SHADER_CACHE.has(idx):
 		var path := SHADER_PATH_TEMPLATE % idx
 		if not ResourceLoader.exists(path):
-			for fdx in SHADER_FLAGS.size():
-				SHADER_FLAGS_CACHE[fdx + SHADER_FLAGS_ALWAYS.size()] = SHADER_FLAGS[fdx][(idx / SHADER_FLAGS_PERMUTATION_SIZES[fdx] % SHADER_FLAGS[fdx].size())]
-
-			var render_flags_string: String
-			var define_flags_string: String
-
-			for flag in SHADER_FLAGS_CACHE:
-				if flag.is_empty(): continue
-				for subflag in flag.split(","):
-					if subflag.begins_with("#"):
-						define_flags_string += "\n#define " + subflag.right(-1) + ";"
-					else:
-						render_flags_string += subflag + ", "
-
-			render_flags_string = "\nrender_mode " + render_flags_string.left(-2) + ";"
-
-			SHADER_CACHE[idx] = Shader.new()
-			SHADER_CACHE[idx].code = SHADER_TEMPLATE.code.insert(SHADER_CODE_INSERT_POSITION, render_flags_string + define_flags_string)
-			SHADER_CACHE[idx].take_over_path(path)
-			ResourceSaver.save(SHADER_CACHE[idx])
+			rebuild_shader(idx)
 
 		SHADER_CACHE[idx] = ResourceLoader.load(path)
 
 	return SHADER_CACHE[idx]
+
+
+static func rebuild_shader(idx: int) -> void:
+	for fdx in SHADER_FLAGS.size():
+		SHADER_FLAGS_CACHE[fdx + SHADER_FLAGS_ALWAYS.size()] = SHADER_FLAGS[fdx][(idx / SHADER_FLAGS_PERMUTATION_SIZES[fdx] % SHADER_FLAGS[fdx].size())]
+
+	var render_flags_string: String
+	var define_flags_string: String
+
+	for flag in SHADER_FLAGS_CACHE:
+		if flag.is_empty(): continue
+		for subflag in flag.split(","):
+			if subflag.begins_with("#"):
+				define_flags_string += "\n#define " + subflag.right(-1) + ";"
+			else:
+				render_flags_string += subflag + ", "
+
+	render_flags_string = "\nrender_mode " + render_flags_string.left(-2) + ";"
+
+	SHADER_CACHE[idx] = Shader.new()
+	SHADER_CACHE[idx].code = SHADER_TEMPLATE.code.insert(SHADER_CODE_INSERT_POSITION, render_flags_string + define_flags_string)
+	SHADER_CACHE[idx].take_over_path(SHADER_PATH_TEMPLATE % idx)
+	ResourceSaver.save(SHADER_CACHE[idx])
+
+
+static func rebuild_shaders() -> void:
+	for idx in SHADER_CACHE.size():
+		if not SHADER_CACHE.has(idx): continue
+		rebuild_shader(idx)
 
 
 static func purge_unused_shaders() -> void:
@@ -102,18 +120,22 @@ static func _static_init() -> void:
 	DirAccess.remove_absolute(SHADER_CACHE_DIR)
 	DirAccess.make_dir_recursive_absolute(SHADER_CACHE_DIR)
 
-	SHADER_FLAGS_PERMUTATION_SIZES.resize(SHADER_FLAGS.size() + 1)
+	SHADER_FLAGS_PERMUTATION_SIZES.resize(SHADER_FLAGS.size())
 	SHADER_FLAGS_PERMUTATION_SIZES.fill(1)
-	for f in SHADER_FLAGS.size():
-		for fi in f:
-			SHADER_FLAGS_PERMUTATION_SIZES[-f - 2] *= SHADER_FLAGS[f - fi].size()
-		SHADER_FLAGS_PERMUTATION_SIZES[-1] *= SHADER_FLAGS_PERMUTATION_SIZES[-f]
+	for i in SHADER_FLAGS.size():
+		for j in SHADER_FLAGS.size() - i - 1:
+			SHADER_FLAGS_PERMUTATION_SIZES[i] *= SHADER_FLAGS[-j - 1].size()
+
+
+	# for f in SHADER_FLAGS.size():
+	# 	print(SHADER_FLAGS[f].size())
+	# 	for fi in f:
+	# 		SHADER_FLAGS_PERMUTATION_SIZES[-f - 1] *= SHADER_FLAGS[fi].size()
+	print(SHADER_FLAGS_PERMUTATION_SIZES)
 
 	SHADER_FLAGS_CACHE = SHADER_FLAGS_ALWAYS.duplicate()
 	for f in SHADER_FLAGS.size():
 		SHADER_FLAGS_CACHE.push_back(SHADER_FLAGS[f][0])
-
-	SHADER_CACHE.resize(SHADER_FLAGS_PERMUTATION_SIZES[-1])
 
 	# purge_unused_shaders()
 
@@ -227,7 +249,13 @@ static func _static_init() -> void:
 @export var billboard_mode: BaseMaterial3D.BillboardMode:
 	set(value):
 		## Currently unsure what BILLBOARD_PARTICLES does or how to implement.
-		billboard_mode = BaseMaterial3D.BillboardMode.BILLBOARD_ENABLED if value == BaseMaterial3D.BillboardMode.BILLBOARD_PARTICLES else value
+		billboard_mode = value
+		refresh_shader()
+
+
+@export var billboard_keep_scale: bool:
+	set(value):
+		billboard_keep_scale = value
 		refresh_shader()
 
 
@@ -249,12 +277,19 @@ func refresh_shader() -> void:
 
 
 func get_shader_index() -> int:
-	return (
-		+ transparency_mode * 729
-		+ cull_mode * 243
-		+ depth_test * 81
-		+ shading_mode * 27
-		+ fog_mode * 9
-		+ (emission_operator + 1 if emission_enabled else 0) * 3
-		+ billboard_mode
-	)
+	var shader_indeces := [
+		transparency_mode,
+		cull_mode,
+		depth_test,
+		shading_mode,
+		fog_mode,
+		emission_operator + 1 if emission_enabled else 0,
+		((billboard_mode * 2 - 1) + (1 if billboard_keep_scale else 0)) if billboard_mode else 0
+	]
+	assert(shader_indeces.size() == SHADER_FLAGS.size(), "Shader index getter must conform to the size of SHADER_FLAGS. Please update the function.")
+
+	var result := 0
+	for i in shader_indeces.size():
+		result += shader_indeces[i] * SHADER_FLAGS_PERMUTATION_SIZES[i]
+
+	return result

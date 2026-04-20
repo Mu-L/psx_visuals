@@ -117,9 +117,8 @@ static func touch_shader_globals() -> void:
 
 #endregion
 
-
 const AUTOLOAD_NAME := "psx_autoload"
-const AUTOLOAD_PATH := "scripts/PsxAutoload.gd"
+const AUTOLOAD_PATH := "PsxAutoload.gd"
 const CONVERT_CURRENT_SCENE_NAME := "Convert Current Scene to PSX..."
 const CONVERT_CURRENT_SCENE_KEY := "psx/convert_current_scene"
 const CONVERT_SELECTED_NODE_NAME := "Convert Selected Node(s) to PSX..."
@@ -128,6 +127,8 @@ const CONVERT_ENTIRE_PROJECT_NAME := "Convert Entire Project to PSX..."
 const CONVERT_ENTIRE_PROJECT_KEY := "psx/convert_entire_project"
 const PURGE_SHADERS_NAME := "Purge Unused Shaders"
 const PURGE_SHADERS_KEY := "psx/purge_unused_shaders"
+const REBUILD_SHADERS_NAME := "Rebuild Unused Shaders"
+const REBUILD_SHADERS_KEY := "psx/rebuild_unused_shaders"
 
 
 var file_system_context_menu_plugin: PsxFileSystemContextMenuPlugin
@@ -140,6 +141,7 @@ const CONVERSION_OPTIONS_DEFAULT := {
 	&"material_take_over_path": true,
 	&"material_force_vertex_lighting": true,
 	&"material_force_vertex_fog": true,
+	&"node_replace_null_with": null,
 }
 
 func _enable_plugin() -> void:
@@ -148,11 +150,13 @@ func _enable_plugin() -> void:
 
 func _enter_tree() -> void:
 	touch_shader_globals()
+
 	var command_palette := get_editor_interface().get_command_palette()
 	command_palette.add_command(CONVERT_CURRENT_SCENE_NAME, CONVERT_CURRENT_SCENE_KEY, convert_current_scene)
 	command_palette.add_command(CONVERT_SELECTED_NODE_NAME, CONVERT_SELECTED_NODE_KEY, convert_selected_nodes)
 	command_palette.add_command(CONVERT_ENTIRE_PROJECT_NAME, CONVERT_ENTIRE_PROJECT_KEY, convert_entire_project)
 	command_palette.add_command(PURGE_SHADERS_NAME, PURGE_SHADERS_KEY, PsxMaterial3D.purge_unused_shaders)
+	command_palette.add_command(REBUILD_SHADERS_NAME, REBUILD_SHADERS_KEY, PsxMaterial3D.rebuild_shaders)
 
 	if file_system_context_menu_plugin == null:
 		file_system_context_menu_plugin = PsxFileSystemContextMenuPlugin.new(self )
@@ -171,6 +175,7 @@ func _enter_tree() -> void:
 		post_process_node.set_script(preload("res://addons/psx/scripts/PsxAutoload.gd"))
 		get_editor_interface().get_editor_viewport_3d().add_child(post_process_node)
 
+
 func _disable_plugin() -> void:
 	remove_autoload_singleton(AUTOLOAD_NAME)
 
@@ -181,6 +186,7 @@ func _exit_tree() -> void:
 	command_palette.remove_command(CONVERT_SELECTED_NODE_KEY)
 	command_palette.remove_command(CONVERT_ENTIRE_PROJECT_KEY)
 	command_palette.remove_command(PURGE_SHADERS_KEY)
+	command_palette.remove_command(REBUILD_SHADERS_KEY)
 
 	if file_system_context_menu_plugin != null:
 		remove_context_menu_plugin(file_system_context_menu_plugin)
@@ -315,7 +321,7 @@ func _convert_node_recursive(node: Node, root: Node, options: Dictionary, clear_
 	var meta_ignore: int = node.get_meta(PsxInspectorPlugin.META_IGNORE, 0)
 	if meta_ignore == 2: return
 
-	if meta_ignore != 1 and node is MeshInstance3D:
+	if meta_ignore != 1 and node is GeometryInstance3D:
 		_convert_node(node, options)
 
 	for child in node.get_children():
@@ -327,8 +333,9 @@ func _convert_node_recursive(node: Node, root: Node, options: Dictionary, clear_
 		MATERIAL_LEDGER.clear()
 
 
-func _convert_node(node: MeshInstance3D, options: Dictionary, clear_ledger := false) -> void:
+func _convert_node(node: GeometryInstance3D, options: Dictionary, clear_ledger := false) -> void:
 	var affected_surfaces: Dictionary[int, Material]
+
 	for idx in node.get_surface_override_material_count():
 		var current_mat := node.material_override
 		if current_mat is PsxMaterial3D: continue

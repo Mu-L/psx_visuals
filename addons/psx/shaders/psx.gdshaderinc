@@ -18,7 +18,7 @@ varying vec4 v_clip;
 varying vec2 v_uv;
 varying vec2 v_uv2;
 
-#ifdef ALPHA_SCISSOR
+#if (!defined ALPHA_DISABLED) && (defined ALPHA_SCISSOR)
 uniform float u_alpha_scissor_threshold: hint_range(0.0, 1.0, 0.01) = 0.5;
 #endif
 
@@ -26,12 +26,12 @@ uniform float u_alpha_scissor_threshold: hint_range(0.0, 1.0, 0.01) = 0.5;
 uniform vec3 u_emission: source_color = vec3(0.0, 0.0, 0.0);
 uniform float u_emission_energy_multiplier = 1.0;
 uniform bool u_emission_on_uv2 = false;
-uniform sampler2D u_emission_texture: hint_default_white, filter_nearest;
+uniform sampler2D u_emission_texture: hint_default_black, filter_nearest;
 #elif defined EMISSION_MULTIPLY
 uniform vec3 u_emission: source_color = vec3(0.0, 0.0, 0.0);
 uniform float u_emission_energy_multiplier = 1.0;
 uniform bool u_emission_on_uv2 = false;
-uniform sampler2D u_emission_texture: hint_default_white, filter_nearest;
+uniform sampler2D u_emission_texture: hint_default_black, filter_nearest;
 #endif
 
 #ifdef VERTEX_FOG_ENABLED
@@ -46,27 +46,54 @@ varying vec3 v_fog_color;
 
 void vertex() {
     v_vertex_color = COLOR.rgb;
+	
+#if !defined BILLBOARD_DISABLED
+#if defined BILLBOARD_KEEP_SCALE
+	mat3 model_basis = mat3(MODEL_MATRIX[0].xyz, MODEL_MATRIX[1].xyz, MODEL_MATRIX[2].xyz);
+	bool mirrored = determinant(model_basis) < 0.0;
+	vec3 model_scale = vec3(
+		length(MODEL_MATRIX[0].xyz),
+		length(MODEL_MATRIX[1].xyz),
+		length(MODEL_MATRIX[2].xyz)
+	) * (mirrored ? -1.0 : 1.0);
+#else
+	vec3 model_scale = vec3(1.0);
+#endif
 
-#if defined BILLBOARD_FULL
+#if (defined BILLBOARD_ENABLED) || (defined BILLBOARD_PARTICLES)
 	MODELVIEW_MATRIX = mat4(
-		vec4(length(MODELVIEW_MATRIX[0].xyz), 0.0, 0.0, 0.0),
-		vec4(0.0, length(MODELVIEW_MATRIX[1].xyz), 0.0, 0.0),
-		vec4(0.0, 0.0, length(MODELVIEW_MATRIX[2].xyz), 0.0),
+		vec4(model_scale.x, 0.0, 0.0, 0.0),
+		vec4(0.0, model_scale.y, 0.0, 0.0),
+		vec4(0.0, 0.0, model_scale.z, 0.0),
 		MODELVIEW_MATRIX[3]
 	);
 	MODELVIEW_NORMAL_MATRIX = mat3(
-		vec3(1.0, 0.0, 0.0),
-		vec3(0.0, 1.0, 0.0),
-		vec3(0.0, 0.0, 1.0)
+		MODELVIEW_MATRIX[0].xyz,
+		MODELVIEW_MATRIX[1].xyz,
+		MODELVIEW_MATRIX[2].xyz
 	);
 
 #elif defined BILLBOARD_FIXED_Y
+	vec3 vr = vec3(1.0, 0.0, 0.0);
+	vec3 vu = VIEW_MATRIX[1].xyz;
+	
 	MODELVIEW_MATRIX = mat4(
-		vec4(length(MODELVIEW_MATRIX[0].xyz), 0.0, 0.0, 0.0),
-		MODELVIEW_MATRIX[1],
-		vec4(cross(vec3(1.0, 0.0, 0.0), MODELVIEW_MATRIX[1].xyz), 0.0),
+		vec4(vr, 0.0),
+		vec4(vu, 0.0),
+		vec4(cross(vr, vu), 0.0),
 		MODELVIEW_MATRIX[3]
+	) * mat4(
+		vec4(model_scale.x, 0, 0, 0),
+		vec4(0, model_scale.y, 0, 0),
+		vec4(0, 0, model_scale.z, 0),
+		vec4(0, 0, 0, MODEL_MATRIX[3][3])
 	);
+	MODELVIEW_NORMAL_MATRIX = mat3(
+		MODELVIEW_MATRIX[0].xyz,
+		MODELVIEW_MATRIX[1].xyz,
+		MODELVIEW_MATRIX[2].xyz
+	);
+#endif
 #endif
 
 	vec2 viewport_ratio = VIEWPORT_SIZE / VIEWPORT_SIZE.y;

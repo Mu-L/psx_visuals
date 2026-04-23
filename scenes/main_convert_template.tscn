@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://ce35nhvbp4qyf"]
+
+[ext_resource type="Texture2D" uid="uid://blpwynvjwergx" path="res://icon.png" id="1_7w5ka"]
+[ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="3_gxiav"]
+[ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="4_cruf5"]
+[ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="11_gcnks"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_o6xl0"]
+sky_material = SubResource("ProceduralSkyMaterial_tefeu")
+
+[sub_resource type="Environment" id="Environment_tipki"]
+background_mode = 2
+sky = SubResource("Sky_o6xl0")
+tonemap_mode = 4
+tonemap_exposure = 2.0
+tonemap_agx_white = 16.5
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tefeu"]
+size = Vector2(10, 10)
+subdivide_width = 3
+subdivide_depth = 3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eocwd"]
+albedo_texture = ExtResource("1_7w5ka")
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_earyt"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ratbf"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.5019608)
+albedo_texture = ExtResource("3_gxiav")
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dogva"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7w5ka"]
+shading_mode = 0
+albedo_texture = SubResource("PlaceholderTexture2D_dogva")
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_f1ktw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sd2kc"]
+albedo_texture = SubResource("PlaceholderTexture2D_f1ktw")
+billboard_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dogva"]
+albedo_texture = ExtResource("1_7w5ka")
+
+[sub_resource type="GDScript" id="GDScript_tefeu"]
+resource_name = "spinny"
+script/source = "extends Node3D
+
+@export var speed : float = 10.0
+
+func _process(delta: float) -> void:
+	rotation_degrees.y += speed * delta
+"
+
+[sub_resource type="SphereMesh" id="SphereMesh_choun"]
+radial_segments = 8
+rings = 3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6t5lq"]
+cull_mode = 1
+albedo_texture = ExtResource("1_7w5ka")
+
+[sub_resource type="Gradient" id="Gradient_choun"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eadjp"]
+albedo_color = Color(0.36, 0.8186667, 1, 1)
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_operator = 1
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_ya4ey"]
+script = ExtResource("11_gcnks")
+points = PackedVector3Array(0, 0, 0, 0, 1, 0)
+color_gradient = SubResource("Gradient_choun")
+material = SubResource("StandardMaterial3D_eadjp")
+metadata/_custom_type_script = "uid://bhof12h30k66g"
+
+[node name="Main" type="Node3D" unique_id=1699994726]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=374673350]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+light_energy = 0.063
+shadow_enabled = true
+directional_shadow_pancake_size = 266.8
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2115240103]
+environment = SubResource("Environment_tipki")
+
+[node name="RigidBody3D4" type="StaticBody3D" parent="." unique_id=2080832859]
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="RigidBody3D4" unique_id=849679747]
+mesh = SubResource("PlaneMesh_tefeu")
+surface_material_override/0 = SubResource("StandardMaterial3D_eocwd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4" unique_id=1956428608]
+shape = SubResource("WorldBoundaryShape3D_tefeu")
+
+[node name="silly_ball" parent="." unique_id=1375805931 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
+material = SubResource("StandardMaterial3D_earyt")
+metadata/_psx_ignore = 1
+
+[node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+material = SubResource("StandardMaterial3D_ratbf")
+
+[node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+material = SubResource("StandardMaterial3D_7w5ka")
+
+[node name="silly_ball4" parent="." unique_id=1547077677 instance=ExtResource("4_cruf5")]
+transform = Transform3D(-0.84724253, 0.14471734, 0.5111134, 0.2471979, 0.95905644, 0.13821684, -0.47018424, 0.24344935, -0.8483273, -2, 2, 2)
+material = SubResource("StandardMaterial3D_sd2kc")
+
+[node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+material = SubResource("StandardMaterial3D_eocwd")
+precision_uv = 0.5
+precision_xy = 0.5
+precision_z = 0.5
+precision_all = 0.5
+
+[node name="silly_ball6" parent="." unique_id=1329159422 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+material = SubResource("StandardMaterial3D_7w5ka")
+
+[node name="silly_ball7" parent="." unique_id=624434434 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+material = SubResource("StandardMaterial3D_earyt")
+
+[node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+material = SubResource("StandardMaterial3D_dogva")
+precision_uv = 0.2
+precision_xy = 0.1
+precision_z = 0.1
+precision_all = 0.1
+
+[node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("4_cruf5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+material = SubResource("StandardMaterial3D_7w5ka")
+
+[node name="Node3D" type="Node3D" parent="." unique_id=1736152543]
+script = SubResource("GDScript_tefeu")
+
+[node name="Camera3D" type="Camera3D" parent="Node3D" unique_id=1162836696]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 12, 21)
+current = true
+fov = 20.0
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1556541999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.881119, 3, 3.369406)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1564800933]
+transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.5850001, 0, 3, 4)
+
+[node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
+transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, -0.9999995, 0)
+mesh = SubResource("SphereMesh_choun")
+surface_material_override/0 = SubResource("StandardMaterial3D_6t5lq")
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=1765450839]
+mesh = SubResource("ImmediateMesh_ya4ey")
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.0
+emission_ring_radius = 5.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 5.0
+gravity = Vector3(0, 2, 0)
+initial_velocity_max = 10.0
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]

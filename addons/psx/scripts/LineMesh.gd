@@ -50,7 +50,6 @@ func _update_mesh() -> void:
 	segment_lengths.resize(points.size())
 	for i in points.size() - 1:
 		segment_lengths[i + 1] = segment_lengths[i] + points[i].distance_to(points[i + 1])
-	print("segment_lengths : %s" % [segment_lengths])
 
 	for i in points.size():
 		surface_set_color(color_gradient.sample(segment_lengths[i] / segment_lengths[-1]))

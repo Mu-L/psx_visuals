@@ -214,3 +214,5 @@ direction = Vector3(0, 1, 0)
 spread = 5.0
 gravity = Vector3(0, 2, 0)
 initial_velocity_max = 10.0
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]

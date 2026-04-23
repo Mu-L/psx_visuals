@@ -4,6 +4,7 @@
 /android/
 
 /addons/psx/shaders/cache/
+/test/
 
 .vscode/
 .DS_Store

@@ -14,6 +14,7 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 	&"emission_on_uv2",
 	&"emission_texture",
 	&"billboard_mode",
+	&"next_pass"
 ]
 
 
@@ -115,8 +116,6 @@ static func purge_unused_shaders() -> void:
 
 
 static func _static_init() -> void:
-	# if not DirAccess.dir_exists_absolute(SHADER_CACHE_DIR):
-		# DirAccess.make_dir_recursive_absolute(SHADER_CACHE_DIR)
 	DirAccess.remove_absolute(SHADER_CACHE_DIR)
 	DirAccess.make_dir_recursive_absolute(SHADER_CACHE_DIR)
 
@@ -126,17 +125,11 @@ static func _static_init() -> void:
 		for j in SHADER_FLAGS.size() - i - 1:
 			SHADER_FLAGS_PERMUTATION_SIZES[i] *= SHADER_FLAGS[-j - 1].size()
 
-
-	# for f in SHADER_FLAGS.size():
-	# 	print(SHADER_FLAGS[f].size())
-	# 	for fi in f:
-	# 		SHADER_FLAGS_PERMUTATION_SIZES[-f - 1] *= SHADER_FLAGS[fi].size()
-	print(SHADER_FLAGS_PERMUTATION_SIZES)
-
 	SHADER_FLAGS_CACHE = SHADER_FLAGS_ALWAYS.duplicate()
 	for f in SHADER_FLAGS.size():
 		SHADER_FLAGS_CACHE.push_back(SHADER_FLAGS[f][0])
 
+	## This is where it should go, but doing so causes issues across the board.
 	# purge_unused_shaders()
 
 

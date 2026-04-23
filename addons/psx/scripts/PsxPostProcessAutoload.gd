@@ -1,7 +1,7 @@
 @tool extends CanvasLayer
 
 const POST_PROCESS_LAYER: int = RenderingServer.CANVAS_LAYER_MAX
-const POST_PROCESS_MATERIAL: ShaderMaterial = preload("uid://da2sluxj84btb")
+const POST_PROCESS_MATERIAL: ShaderMaterial = preload("res://addons/psx/materials/psx_post_process.tres")
 
 
 func _init() -> void:

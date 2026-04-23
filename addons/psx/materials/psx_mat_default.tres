@@ -7,7 +7,5 @@
 render_priority = 0
 shader = ExtResource("2_n74or")
 shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_color = Color(0, 0.30800003, 0.66, 1)
+shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
 script = ExtResource("1_n74or")
-albedo_color = Color(0, 0.30800003, 0.66, 1)
-emission = Color(1, 1, 1, 1)

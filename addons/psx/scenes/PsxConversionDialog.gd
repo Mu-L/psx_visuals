@@ -21,6 +21,4 @@ func _get_options() -> Dictionary:
 		if child is not PsxConversionDialogOption: continue
 		result[child.name] = child.get_option_value()
 
-	print("result: ", result)
-
 	return result

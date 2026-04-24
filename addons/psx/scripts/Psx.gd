@@ -328,11 +328,11 @@ func convert_current_scene() -> void:
 
 
 func convert_selected_nodes() -> void:
-	convert_selected_nodes_context(get_editor_interface().get_selection().get_top_selected_nodes(), get_editor_interface().get_edited_scene_root())
+	convert_selected_nodes_context(get_editor_interface().get_selection().get_top_selected_nodes())
 	get_editor_interface().mark_scene_as_unsaved()
 
 
-func convert_selected_nodes_context(nodes: Array, root: Node = nodes[0]) -> void:
+func convert_selected_nodes_context(nodes: Array, root: Node = get_editor_interface().get_edited_scene_root()) -> void:
 	if not await prompt_options_dialog(): return
 	var options := PsxConversionDialog.get_options()
 
@@ -410,7 +410,18 @@ func _convert_node_recursive(node: Node, options: Dictionary, root: Node = node)
 
 
 func _convert_single_node(node: Node, options: Dictionary) -> void:
-	if node is MeshInstance3D:
+	if options[&"resource_deep"]:
+		if node is MeshInstance3D:
+			_convert_mesh(node.mesh, options)
+
+		if node is CPUParticles3D:
+			_convert_mesh(node.mesh, options)
+
+		if node is GPUParticles3D:
+			for i in node.draw_passes:
+				_convert_mesh(node.get(&"draw_pass_" + str(i + 1)), options)
+
+	elif node is MeshInstance3D and node.mesh != null:
 		for idx in node.get_surface_override_material_count():
 			var mat_prev: Material = node.get_surface_override_material(idx)
 			var mat_prev_from_override := true
@@ -421,15 +432,7 @@ func _convert_single_node(node: Node, options: Dictionary) -> void:
 
 			if mat_prev is PsxMaterial3D: continue
 
-			var mat_new: PsxMaterial3D
-			if mat_prev == null:
-				match options[&"node_replace_null_with"]:
-					0: continue
-					1: mat_new = MAT_PLACEHOLDER
-					2: mat_new = MAT_DEFAULT
-			else:
-				mat_new = _convert_material(mat_prev, options)
-
+			var mat_new := _convert_material(mat_prev, options)
 			if mat_new == null or mat_new == mat_prev: continue
 
 			if options[&"resource_deep"] and not mat_prev_from_override:
@@ -437,7 +440,7 @@ func _convert_single_node(node: Node, options: Dictionary) -> void:
 			else:
 				node.set_surface_override_material(idx, mat_new)
 
-	if node is GeometryInstance3D:
+	elif node is GeometryInstance3D:
 		if options[&"node_convert_override"]:
 			var mat_prev: Material = node.material_override
 			if mat_prev != null and mat_prev is not PsxMaterial3D:
@@ -456,18 +459,33 @@ func _convert_single_node(node: Node, options: Dictionary) -> void:
 		_convert_object_plist(node, options)
 
 
+func _convert_mesh(mesh: Mesh, options: Dictionary) -> void:
+	if mesh == null: return
+
+	for idx in mesh.get_surface_count():
+		mesh.surface_set_material(idx, _convert_material(mesh.surface_get_material(idx), options))
+
+	if ResourceLoader.exists(mesh.resource_path):
+		ResourceSaver.save(mesh)
+
+
 func _convert_object_plist(obj: Object, options: Dictionary) -> void:
-	print("obj : %s" % [obj])
 	for prop in obj.get_property_list():
 		if prop[&"type"] != TYPE_OBJECT: continue
 		if not prop[&"usage"] & PROPERTY_USAGE_STORAGE: continue
+		if not ClassDB.is_parent_class(prop[&"class_name"], "Material"): continue
 
-		print("prop : %s" % [prop])
+		var prop_value = obj.get(prop[&"name"])
 
-		var mat_prev = obj.get(prop[&"name"])
-		if mat_prev is not Material: continue
+		if prop_value is Mesh and options[&"resource_deep"]:
+			_convert_mesh(prop_value, options)
+			if ResourceLoader.exists(prop_value.resource_path):
+				obj.set(prop[&"name"], ResourceLoader.load(prop_value.resource_path))
+			continue
 
-		var mat_new := _convert_material(mat_prev, options)
+		if prop_value is not Material: continue
+
+		var mat_new := _convert_material(prop_value, options)
 		if mat_new == null: continue
 
 		obj.set(prop[&"name"], mat_new)
@@ -505,6 +523,12 @@ func _create_psx_material_from(material: Material, options: Dictionary) -> PsxMa
 		return null
 
 	var result: PsxMaterial3D = null
+
+	if material == null:
+		match options[&"node_replace_null_with"]:
+			0: return null
+			1: return MAT_PLACEHOLDER
+			2: return MAT_DEFAULT
 
 	if material is BaseMaterial3D:
 		result = PsxMaterial3D.new()

@@ -135,6 +135,9 @@ static func _static_init() -> void:
 
 #endregion
 
+## A list of [Material]s that have previously been converted into this one. Used in the editor; should not be exported/used in an exported game. But, here for your convenience.
+@export_custom(PROPERTY_HINT_ARRAY_TYPE, "Material", PROPERTY_USAGE_NONE | PROPERTY_USAGE_EDITOR) var convert_materials: Array[Material]
+
 
 @export_subgroup("Transparency")
 

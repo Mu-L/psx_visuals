@@ -140,15 +140,15 @@ psx_bit_depth={
 }
 psx_fog_color={
 "type": "color",
-"value": Color(0.5, 0.5, 0.5, 0)
+"value": Color(0.5, 0.5, 0.5, 0.2509804)
 }
 psx_fog_far={
 "type": "float",
-"value": 20.0
+"value": 32.0
 }
 psx_fog_near={
 "type": "float",
-"value": 10.0
+"value": 24.0
 }
 psx_precision_uv={
 "type": "float",

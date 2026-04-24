@@ -118,7 +118,7 @@ void vertex() {
 
 #ifdef VERTEX_FOG_ENABLED
 	v_fog_strength = psx_fog_near != psx_fog_far ?
-		clamp(psx_fog_color.a * (v_clip.w - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
+		psx_fog_color.a * clamp((v_clip.w - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
 		0.0;
 	v_fog_color = mix(vec3(0), psx_fog_color.rgb, v_fog_strength);
 #endif

@@ -44,7 +44,7 @@ albedo_texture = ExtResource("1_4tkgg")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_earyt"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_uocr2"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nh7xp"]
 render_priority = 0
 shader = ExtResource("6_rpp31")
 shader_parameter/u_vertex_color_use_as_albedo = false
@@ -58,7 +58,7 @@ albedo_color = Color(1, 1, 1, 0.5019608)
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_dogva"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_6nh6p"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6u0c3"]
 render_priority = 0
 shader = ExtResource("7_nh7xp")
 shader_parameter/u_vertex_color_use_as_albedo = false
@@ -71,7 +71,7 @@ albedo_texture = SubResource("PlaceholderTexture2D_dogva")
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_f1ktw"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ui4gv"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uocr2"]
 render_priority = 0
 shader = ExtResource("8_6u0c3")
 shader_parameter/u_vertex_color_use_as_albedo = false
@@ -82,17 +82,7 @@ vertex_color_use_as_albedo = false
 albedo_texture = SubResource("PlaceholderTexture2D_f1ktw")
 billboard_mode = 2
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_xcn4n"]
-render_priority = 0
-shader = ExtResource("3_11i3h")
-shader_parameter/u_vertex_color_use_as_albedo = false
-shader_parameter/u_albedo_texture = ExtResource("1_4tkgg")
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-script = ExtResource("2_o6h54")
-vertex_color_use_as_albedo = false
-albedo_texture = ExtResource("1_4tkgg")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_s0nin"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6nh6p"]
 render_priority = 0
 shader = ExtResource("3_11i3h")
 shader_parameter/u_vertex_color_use_as_albedo = false
@@ -100,7 +90,7 @@ shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
 script = ExtResource("2_o6h54")
 vertex_color_use_as_albedo = false
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_8pne5"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ui4gv"]
 render_priority = 0
 shader = ExtResource("3_11i3h")
 shader_parameter/u_vertex_color_use_as_albedo = false
@@ -124,7 +114,7 @@ func _process(delta: float) -> void:
 radial_segments = 8
 rings = 3
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_nh7xp"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xcn4n"]
 render_priority = 0
 shader = ExtResource("6_7qr6a")
 shader_parameter/u_vertex_color_use_as_albedo = false
@@ -179,19 +169,19 @@ metadata/_psx_ignore = 1
 
 [node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-material = SubResource("ShaderMaterial_uocr2")
+material = SubResource("ShaderMaterial_nh7xp")
 
 [node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
-material = SubResource("ShaderMaterial_6nh6p")
+material = SubResource("ShaderMaterial_6u0c3")
 
 [node name="silly_ball4" parent="." unique_id=1547077677 instance=ExtResource("2_il36l")]
 transform = Transform3D(-0.84724253, 0.14471734, 0.5111134, 0.2471979, 0.95905644, 0.13821684, -0.47018424, 0.24344935, -0.8483273, -2, 2, 2)
-material = SubResource("ShaderMaterial_ui4gv")
+material = SubResource("ShaderMaterial_uocr2")
 
 [node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
-material = SubResource("ShaderMaterial_xcn4n")
+material = SubResource("ShaderMaterial_rpp31")
 precision_uv = 0.5
 precision_xy = 0.5
 precision_z = 0.5
@@ -199,15 +189,15 @@ precision_all = 0.5
 
 [node name="silly_ball6" parent="." unique_id=1329159422 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
-material = SubResource("ShaderMaterial_6nh6p")
+material = SubResource("ShaderMaterial_6u0c3")
 
 [node name="silly_ball7" parent="." unique_id=624434434 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
-material = SubResource("ShaderMaterial_s0nin")
+material = SubResource("ShaderMaterial_6nh6p")
 
 [node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
-material = SubResource("ShaderMaterial_8pne5")
+material = SubResource("ShaderMaterial_ui4gv")
 precision_uv = 0.1
 precision_xy = 0.1
 precision_z = 0.1
@@ -215,7 +205,7 @@ precision_all = 0.1
 
 [node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("2_il36l")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
-material = SubResource("ShaderMaterial_6nh6p")
+material = SubResource("ShaderMaterial_6u0c3")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=1736152543]
 script = SubResource("GDScript_tefeu")
@@ -227,6 +217,7 @@ fov = 20.0
 
 [node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1556541999]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.881119, 3, 3.369406)
+omni_range = 8.0
 
 [node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1564800933]
 transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.5850001, 0, 3, 4)
@@ -234,7 +225,7 @@ transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.58500
 [node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
 transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, -0.9999995, 0)
 mesh = SubResource("SphereMesh_choun")
-surface_material_override/0 = SubResource("ShaderMaterial_nh7xp")
+surface_material_override/0 = SubResource("ShaderMaterial_xcn4n")
 
 [node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=1765450839]
 mesh = SubResource("ImmediateMesh_ya4ey")

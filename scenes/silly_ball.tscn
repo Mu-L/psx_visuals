@@ -13,16 +13,15 @@ rings = 3
 [node name="silly_ball" type="RigidBody3D" unique_id=1375805931]
 linear_damp = 1.0
 script = ExtResource("1_etg74")
-material = ExtResource("2_txpge")
 change_interval = Vector2(0.8, 1.6)
 speed_range = Vector2(10, 20)
 
 [node name="mesh" type="MeshInstance3D" parent="." unique_id=809775467]
-material_override = ExtResource("2_txpge")
 instance_shader_parameters/i_precision_uv = 1.0
 instance_shader_parameters/i_precision_xy = 1.0
 instance_shader_parameters/i_precision_z = 1.0
 mesh = SubResource("SphereMesh_o5qli")
+surface_material_override/0 = ExtResource("2_txpge")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=259735888]
 shape = SubResource("SphereShape3D_tbgi4")

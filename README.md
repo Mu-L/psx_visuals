@@ -7,91 +7,72 @@ This addon contains a set of shaders and materials you can use to make your game
 
 | Section | Description |
 |-|-|
-| [Conversion Wizard](#conversion-wizard) | How to convert scenes/materials in your project to PSX |
-| [Materials](#materials) | A list of included materials and what they do |
-| [Material Parameters](#material-parameters) | How to use/modify parameters in each of the included materials |
-| [Shaders](#shaders) | A list of included shaders and what they do |
-| [Global Parameters](#global-shader-parameters) | How to use/modify included global shader features
+| [Quickstart](#quickstart) | How to set up the Plugin |
+| [PsxMaterial3D](#psxmaterial3d) | The main event. How to create custom PSX materials and how to use them |
+| [Shader Globals](#shader-globals) | A list of included global shader features |
+| [Resource Conversion Tool](#conversion-tool) | How to use the conversion tool to quickly modify resources/scenes |
+| [List of Visual Features]() | |
 
+## Quickstart
 
-## Conversion Wizard
+To install:
 
-In a PSX-style game, you will want to use a PSX material on almost all `MeshInstance3D`s in every 3D scene. You can do this manually, but this can take lots of time. The Conversion Wizard is a tool that can help you convert scenes, materials, or an entire project into PSX.
+1. Add the contents of this package to your project, into the folder `res://addons/psx`
+2. In project Settings, enable the associated Plugin
+3. Restart the editor
+4. Verify installation by looking for the following components
+	- Autoload Node called `psx_post_process`
+	- [New Shader Globals](#shader-globals)
+	- [New context menu options]() in the FileSystem and SceneTree
+	- [New commands]() in the command palette
+	- A newly created folder `res://addons/psx/shaders/cache` with some shader files inside
 
-> [!CAUTION]
-> Using the conversion Wizard is currently irreversible. Make a backup or VCS commit of your project before using.
+## `PsxMaterial3D`
 
-Keep in mind during the conversion process:
+`PsxMaterial3D` is a new kind of Material. In a PSX-style game, most (or all) of your 3D Geometry should inherit from `PsxMaterial3D`. It is very similar to `StandardMaterial3D`. To create one, either create a new Resource, or right-click on a Material in the FileSystem and choose `Context Menu > Convert Selected Resource(s) to PSX...`
 
-<!-- - If the `Node.owner` is not the scene root, the `Node` will not be processed. -->
-- You can add a meta value named `psx_ignore` of type `bool` to any Node to control if the Wizard should modify any `Node`.
-	- If `null` or not present, the converter will process the `Node` normally.
-	- If `false`, the converter will ignore THIS `Node`, but will continue on to its children.
-	- If `true`, the converter will ignore this `Node`, AND ALL its children.
-- You can add a meta value named `psx_auto` of type `Material` to the root of any scene to enforce
+### Additions to `StandardMaterial3D`
 
+The following is an explanation of properties in `PsxMaterial3D` that differ from `StandardMaterial3D`.
 
-<!--
-This is how it works:
+- `fog_mode`: There are now 3 options for fog.
+	- Disabled ( `render_mode fog_disabled` )
+	- Per-Pixel ( unchanged, use regular distance fog )
+	- Per-Vertex. This is the standard for PSX distance fog.
 
-- For all selected scenes, the Wizard will march through every `Node` in the tree. If:
-	- The `Node` is a `MeshInstance3D`, AND
-	- The `Node` DOES NOT contain the meta value `_psx_ignore == true` :
-- Try to convert the replace available surfaces overrides to PSX. Then, for each `MeshInstance3D.get_surface_material_override()`, if:
-	- The `Material` is NOT null, AND (
-	- The `Material` is NOT a `ShaderMaterial`, OR
-	- The `Material.shader.resource_name` DOES NOT begin with `psx_` ) :
-- See if a PSX material already exists for the given material.
-	- If `true`: Use that material; continue to next surface.
-	- If `false`:
-		- Create a new material with PSX shader.
-		- Save alongside existing material; prefix with `psx_`.
-		- Set new material to the surface material override.
-		- Material parameters will be copied over, using naming convention of `StandardMaterial3D`. -->
+- Instance shader parameters `i_precision_uv`, `i_precision_xy`, and `i_precision_z`. These act as scalars for their shader global counterparts.
 
+> [!TIP]
+> Due to the way that PsxMaterial3D is implemented, a new shader may need to be created each time certain parameters are set. These shaders are stored in `res://addons/psx/shaders/cache`. The system will automatically handle these shaders, but they must be manually removed when no longer in use. It is recommended you do the following before exporting your project:
+> 1. Close all open Scenes
+> 2. Restart the editor
+> 3. Open the command palette and run `Psx > Purge Unused Shaders`.
+>
+> This operation is very safe and will never delete any used shaders. Alternatively, you can delete the cache folder entirely, but this is a more nuclear option and may result in loss of data.
 
-### How to Use
-
-1. Do either of the following (these perform the same action):
-	- Go to `Project > Tools > Convert Scene(s) to PSX...`
-	- Go to `Command Palette > Psx > Convert Scene(s) to PSX...`
-
-
-## Shaders
-
-There are four shaders to choose from, though all of them are nearly identical except for a few static flags:
-
-- `psx_opaque.gdshader` : Suitable for opaque or cutout textures.
-- `psx_opaque_double.gdshader` : Double sided version of `psx_opaque`.
-- `psx_transparent.gdshader` : Suitable for semi-opaque textures.
-- `psx_transparent_double.gdshader` : Double sided version of `psx_transparent`.
-
-
-## Global Shader Parameters
+## Shader Globals
 
 This is a list of all global shader properties (modified in `Project Settings > Globals > Shader Globals`). These properties are created when enabling the plugin for the first time.
 
-- [`psx_affine_strength`](#affine-texture-mapping)
-- [`psx_bit_depth`](#limited-color-bit-depth)
+- [`psx_affine_strength`](#psx_affine_strength)
+- [`psx_bit_depth`](#psx_bit_depth)
 - [`psx_fog_color`](#psx_fog_color)
 - [`psx_fog_far`](#psx_fog_far)
 - [`psx_fog_near`](#psx_fog_near)
-- [`psx_snap_distance`](#vertex-snapping-jitter)
+- [`psx_precision_uv`](#vertex-precision-uv)
+- [`psx_precision_xy`](#vertex-precision-xy)
+- [`psx_precision_z`](#vertex-precision-z)
 
 > [!TIP]
 > Any or all of these properties can be converted to instance shader parameters if desired. Feel free to modify to your liking. For the sake of simplicity, they have been set to global parameters.
 
-### Affine Texture Mapping
+### `psx_affine_strength`
 
-This component recreates the dizzying effect of textures warping due to a lack of a depth buffer. It is controlled by the `psx_affine_strength` shader global. The default value is `1.0`. `0.0` will disable the effect. It is generally not recommended to use values outside the `0...1` range.
+This component recreates the dizzying effect of textures warping due to a lack of a depth buffer. The default value is `1.0`. `0.0` will disable the effect. It is generally not recommended to use values outside the `0...1` range.
 
-### Limited Color Bit Depth
+### `psx_bit_depth`
 
-This component recreates the effect of rendered colors being limited to a certain number of bits, with a dithered matrix to interpolate between them. It is controlled by the `psx_bit_depth` shader global. The default value is `5` (original hardware value). `0` disables the effect.
-
-### Fog
-
-This component recreates the distance fog effect used in the original [Silent Hill](https://youtu.be/6QD55_DcxrM) games. It applies a vertex-based additive emission to meshes, similar to how vertex lighting works. Using lower-poly meshes will therefore result in lower-detail fog, and high-resolution meshes will create higher-detail fog.  It is controlled by three values:
+This component recreates the effect of rendered colors being limited to a certain number of bits, with a dithered matrix to interpolate between them. The default value is `5` (original hardware value). `0` disables the effect.
 
 #### `psx_fog_color`
 
@@ -112,56 +93,39 @@ This value controls at which distance the fog should reach full transparency. Th
 
 This component recreates the effect of vertices being limited to integer screen pixels. It is controlled by the `psx_snap_distance` shader global. The default value is `1.0`. Higher values will increase the effect. `0.0` will disable the effect.
 
+## Conversion Wizard
 
-## Materials
+In a PSX-style game, you will want to use a PSX material on almost all `MeshInstance3D`s in every 3D scene. You can do this manually, but this can take lots of time. The Conversion Wizard is a tool that can help you convert scenes, materials, or an entire project into PSX.
 
-There are a few built-in materials for use or duplication:
+> [!CAUTION]
+> Using the conversion Wizard is currently irreversible. Make a backup or VCS commit of your project before using.
 
-- `mat_psx_default.tres` : Default material to showcase vertex effects. Works with Gouraud shading too.
-- `mat_psx_placeholder.tres` : Placeholder material to showcase affine texture warping.
-- `mat_psx_post_process.tres` : Built-in material to showcase bit depth reduction. DO NOT DELETE!
-- `mat_psx_shadow_32x32.tres` : Built-in material to showcase `RayShadowCaster` shadows.
+Keep in mind during the conversion process:
+
+<!-- - If the `Node.owner` is not the scene root, the `Node` will not be processed. -->
+- You can add a meta value named `psx_ignore` of type `bool` to any Node to control if the Wizard should modify any `Node`.
+	- If `null` or not present, the converter will process the `Node` normally.
+	- If `false`, the converter will ignore THIS `Node`, but will continue on to its children.
+	- If `true`, the converter will ignore this `Node`, AND ALL its children.
+- You can add a meta value named `psx_auto` of type `Material` to the root of any scene to enforce
+
+# Visual Features Reference
+
+## Affine Texture Warping
+
+## Bit Depth Reduction
+
+## Vertex Jitter
 
 
-## Material Parameters
 
-This is a list of the uniform shader properties on all PSX shaders.
+## Fog
 
-- [`use_vertex_colors_as_albedo`](#use-vertex-colors-as-albedo-gouraud-shading)
-- [`use_global_fog`](#use-global-fog)
-- [`albedo`](#albedo)
-- [`albedo_tint`](#albedo-tint)
-- [`emission`](#emission)
-- [`emission_tint`](#emission-tint)
-- [`alpha_scissor_threshold`](#alpha-scissor-threshold)
+This component recreates the distance fog effect used in the original [Silent Hill](https://youtu.be/6QD55_DcxrM) games. It applies a vertex-based additive emission to meshes, similar to how vertex lighting works. Using lower-poly meshes will therefore result in lower-detail fog, and high-resolution meshes will create higher-detail fog.  It is controlled by three values:
 
-### Use Vertex Colors as Albedo (Gouraud Shading)
 
-If this is enabled, the mesh's vertex color will be used as the base color for material. This is a simple way to give color details to a mesh without needing a texture. The default value is `true`.
+# Unsupported Features
 
-> [!TIP]
-> In Blender, you can add a vertex color layer by selecting `Properties Window > Data > Color Attributes > Add Color Attribute` and then modified using `Vertex Paint` mode.
+This is a list of features that are not yet supported. Links to associated [GitHub issues](https://github.com/snotbane/psx_visuals/issues) are attached.
 
-### Use Global Fog
-
-If this is enabled, global distance fog will be applied to this material. The default value is `true`.
-
-### Albedo
-
-This is the standard albedo texture for the material. Also determines opacity. If you already have vertex colors applied, consider using a grayscale albedo texture.
-
-### Albedo Tint
-
-Simple multiplier for `albedo`. Also affects opacity.
-
-### Emission
-
-This is the emission texture for the material. Not affected by vertex colors.
-
-### Emission Tint
-
-Simple multiplier for `emission`.
-
-### Alpha Scissor Threshold
-
-Simple hook for `ALPHA_SCISSOR_THRESHOLD`. Only affects the material when `albedo` contains transparent pixels.
+- [Painter's Algorithm / Z-Buffer Errors](https://github.com/snotbane/psx_visuals/issues/12)

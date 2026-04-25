@@ -11,7 +11,7 @@ class PsxFileSystemContextMenuPlugin extends EditorContextMenuPlugin:
 
 
 	func _popup_menu(paths: PackedStringArray) -> void:
-		add_context_menu_item("Convert Selected Resource(s) to PSX...", plugin.convert_resource_paths_context)
+		add_context_menu_item("Convert Selected Resource(s) to PSX...", plugin.CONTEXT_convert_selected_paths)
 
 
 class PsxSceneTreeContextMenuPlugin extends EditorContextMenuPlugin:
@@ -23,7 +23,7 @@ class PsxSceneTreeContextMenuPlugin extends EditorContextMenuPlugin:
 
 
 	func _popup_menu(paths: PackedStringArray) -> void:
-		add_context_menu_item("Convert Node(s) to PSX...", plugin.convert_selected_nodes_context)
+		add_context_menu_item("Convert Node(s) to PSX...", plugin.CONTEXT_convert_selected_nodes)
 
 
 class PsxInspectorPlugin extends EditorInspectorPlugin:
@@ -98,6 +98,36 @@ class PsxInspectorPlugin extends EditorInspectorPlugin:
 		node.set_meta(META_MATERIAL, resource if resource else null)
 
 #endregion
+
+
+#region Commands
+
+func COMMAND_convert_entire_project() -> void:
+	if not await converter.prompt(): return
+	converter.convert_resource_paths(["res://"])
+
+
+func COMMAND_convert_current_scene() -> void:
+	if not await converter.prompt(): return
+	converter.convert_tree(get_editor_interface().get_edited_scene_root())
+
+
+func COMMAND_convert_selected_nodes() -> void:
+	if not await converter.prompt(): return
+	converter.convert_nodes(get_editor_interface().get_selection().get_selected_nodes())
+
+
+func CONTEXT_convert_selected_paths(paths: Array) -> void:
+	if not await converter.prompt(): return
+	converter.convert_resource_paths(paths)
+
+
+func CONTEXT_convert_selected_nodes(nodes: Array) -> void:
+	if not await converter.prompt(): return
+	converter.convert_nodes(nodes)
+
+#endregion
+
 
 #region Shader Globals
 
@@ -204,7 +234,8 @@ const PURGE_SHADERS_KEY := "psx/purge_unused_shaders"
 const REBUILD_SHADERS_NAME := "Rebuild Unused Shaders"
 const REBUILD_SHADERS_KEY := "psx/rebuild_unused_shaders"
 
-
+static var CONVERTER_SCENE: PackedScene:
+	get: return load("res://addons/psx/scenes/PsxConversionDialog.tscn")
 static var MAT_DEFAULT: PsxMaterial3D:
 	get: return load("res://addons/psx/materials/psx_mat_default.tres")
 static var MAT_PLACEHOLDER: PsxMaterial3D:
@@ -216,6 +247,7 @@ static func get_path_file_name(path: String) -> String:
 
 
 static func append_suffix_to_path(path: String, suffix: String = "_psx") -> String:
+	if path.contains("::"): return path
 	return path.left(path.rfind(".")) + suffix + "." + path.get_extension()
 
 
@@ -246,19 +278,24 @@ var file_system_context_menu_plugin: PsxFileSystemContextMenuPlugin
 var scene_tree_context_menu_plugin: PsxSceneTreeContextMenuPlugin
 var inspector_plugin: PsxInspectorPlugin
 var post_process_node: Node
+var converter: PsxConversionDialog
 
 
 func _enable_plugin() -> void:
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
 
 
+func _disable_plugin() -> void:
+	remove_autoload_singleton(AUTOLOAD_NAME)
+
+
 func _enter_tree() -> void:
 	touch_shader_globals()
 
 	var command_palette := get_editor_interface().get_command_palette()
-	command_palette.add_command(CONVERT_CURRENT_SCENE_NAME, CONVERT_CURRENT_SCENE_KEY, convert_current_scene)
-	command_palette.add_command(CONVERT_SELECTED_NODE_NAME, CONVERT_SELECTED_NODE_KEY, convert_selected_nodes)
-	command_palette.add_command(CONVERT_ENTIRE_PROJECT_NAME, CONVERT_ENTIRE_PROJECT_KEY, convert_entire_project)
+	command_palette.add_command(CONVERT_CURRENT_SCENE_NAME, CONVERT_CURRENT_SCENE_KEY, COMMAND_convert_current_scene)
+	command_palette.add_command(CONVERT_SELECTED_NODE_NAME, CONVERT_SELECTED_NODE_KEY, COMMAND_convert_selected_nodes)
+	command_palette.add_command(CONVERT_ENTIRE_PROJECT_NAME, CONVERT_ENTIRE_PROJECT_KEY, COMMAND_convert_entire_project)
 	command_palette.add_command(PURGE_SHADERS_NAME, PURGE_SHADERS_KEY, PsxMaterial3D.purge_unused_shaders)
 	command_palette.add_command(REBUILD_SHADERS_NAME, REBUILD_SHADERS_KEY, PsxMaterial3D.rebuild_shaders)
 
@@ -279,9 +316,9 @@ func _enter_tree() -> void:
 		post_process_node.set_script(preload(AUTOLOAD_PATH))
 		get_editor_interface().get_editor_viewport_3d().add_child(post_process_node)
 
-
-func _disable_plugin() -> void:
-	remove_autoload_singleton(AUTOLOAD_NAME)
+	if converter == null:
+		converter = CONVERTER_SCENE.instantiate()
+		get_editor_interface().get_editor_main_screen().add_child(converter)
 
 
 func _exit_tree() -> void:
@@ -307,277 +344,5 @@ func _exit_tree() -> void:
 	if post_process_node != null:
 		post_process_node.queue_free()
 
-
-signal options_retrieved(response: bool)
-func prompt_options_dialog():
-	PsxConversionDialog.prompt(get_editor_interface().get_editor_main_screen())
-
-	if not PsxConversionDialog.inst.confirmed.is_connected(options_retrieved.emit):
-		PsxConversionDialog.inst.confirmed.connect(options_retrieved.emit.bind(true))
-		PsxConversionDialog.inst.canceled.connect(options_retrieved.emit.bind(false))
-
-	return await options_retrieved
-
-func convert_entire_project() -> void:
-	convert_resource_paths_context(["res://"])
-
-
-func convert_current_scene() -> void:
-	convert_selected_nodes_context([get_editor_interface().get_edited_scene_root()])
-	get_editor_interface().mark_scene_as_unsaved()
-
-
-func convert_selected_nodes() -> void:
-	convert_selected_nodes_context(get_editor_interface().get_selection().get_top_selected_nodes())
-	get_editor_interface().mark_scene_as_unsaved()
-
-
-func convert_selected_nodes_context(nodes: Array, root: Node = get_editor_interface().get_edited_scene_root()) -> void:
-	if not await prompt_options_dialog(): return
-	var options := PsxConversionDialog.get_options()
-
-	if nodes.is_empty():
-		printerr("No nodes selected!")
-		return
-
-	for node in nodes:
-		_convert_node_recursive(node, options, root)
-
-
-func convert_resource_paths_context(paths: Array) -> void:
-	if not await prompt_options_dialog(): return
-	var options := PsxConversionDialog.get_options()
-
-	var resources: Array
-	if options[&"include_all_properties"]:
-		resources = get_resources(paths, "Resource")
-	else:
-		if options[&"convert_shader_materials"]:
-			resources.append_array(get_resources(paths, "ShaderMaterial"))
-		if options[&"convert_base_material_3ds"]:
-			resources.append_array(get_resources(paths, "BaseMaterial3D"))
-		if options[&"include_scenes"]:
-			resources.append_array(get_resources(paths, "PackedScene"))
-
-	for res in resources.duplicate():
-		if res is PsxMaterial3D: resources.erase(res)
-
-	if resources.is_empty():
-		printerr("No convertible paths were selected in the FileSystem.")
-		return
-
-	for res in resources:
-		if res is PackedScene:
-			_convert_packed_scene(res, options)
-		elif res is Material:
-			_convert_material(res, options)
-		else:
-			assert(false, "Unconvertible resource '%s' found." % res)
-
-
-func _convert_packed_scene(scene: PackedScene, options: Dictionary) -> PackedScene:
-	var root := scene.instantiate(PackedScene.GenEditState.GEN_EDIT_STATE_INSTANCE)
-	if root == null:
-		printerr("Error opening scene for conversion: '%s' " % scene.resource_path)
-		return null
-
-	_convert_node_recursive(root, options, root)
-
-	var new_scene := PackedScene.new()
-	var err := new_scene.pack(root)
-	root.queue_free()
-
-	if err:
-		printerr("Error packing scene '%s' after conversion: %s" % [scene.resource_path, error_string(err)])
-		return null
-
-	new_scene.take_over_path(scene.resource_path)
-	ResourceSaver.save(new_scene)
-
-	return new_scene
-
-
-func _convert_node_recursive(node: Node, options: Dictionary, root: Node = node) -> void:
-	var meta_ignore: int = node.get_meta(PsxInspectorPlugin.META_IGNORE, 0)
-	match meta_ignore:
-		2: return
-		0: _convert_single_node(node, options)
-
-	for child in node.get_children():
-		if child.owner != root: continue
-
-		_convert_node_recursive(child, options, root)
-
-
-func _convert_single_node(node: Node, options: Dictionary) -> void:
-	if options[&"resource_deep"]:
-		if node is MeshInstance3D:
-			_convert_mesh(node.mesh, options)
-
-		if node is CPUParticles3D:
-			_convert_mesh(node.mesh, options)
-
-		if node is GPUParticles3D:
-			for i in node.draw_passes:
-				_convert_mesh(node.get(&"draw_pass_" + str(i + 1)), options)
-
-	elif node is MeshInstance3D and node.mesh != null:
-		for idx in node.get_surface_override_material_count():
-			var mat_prev: Material = node.get_surface_override_material(idx)
-			var mat_prev_from_override := true
-
-			if mat_prev == null:
-				mat_prev = node.mesh.surface_get_material(idx)
-				mat_prev_from_override = false
-
-			if mat_prev is PsxMaterial3D: continue
-
-			var mat_new := _convert_material(mat_prev, options)
-			if mat_new == null or mat_new == mat_prev: continue
-
-			if options[&"resource_deep"] and not mat_prev_from_override:
-				node.mesh.surface_set_material(idx, mat_new)
-			else:
-				node.set_surface_override_material(idx, mat_new)
-
-	elif node is GeometryInstance3D:
-		if options[&"node_convert_override"]:
-			var mat_prev: Material = node.material_override
-			if mat_prev != null and mat_prev is not PsxMaterial3D:
-				var mat_new: PsxMaterial3D = _convert_material(mat_prev, options)
-				if mat_new is PsxMaterial3D:
-					node.material_override = mat_new
-
-		if options[&"node_convert_overlay"]:
-			var mat_prev: Material = node.material_overlay
-			if mat_prev != null and mat_prev is not PsxMaterial3D:
-				var mat_new := _convert_material(mat_prev, options)
-				if mat_new:
-					node.material_overlay = mat_new
-
-	if options[&"include_all_properties"]:
-		_convert_object_plist(node, options)
-
-
-func _convert_mesh(mesh: Mesh, options: Dictionary) -> void:
-	if mesh == null: return
-
-	for idx in mesh.get_surface_count():
-		mesh.surface_set_material(idx, _convert_material(mesh.surface_get_material(idx), options))
-
-	if ResourceLoader.exists(mesh.resource_path):
-		ResourceSaver.save(mesh)
-
-
-func _convert_object_plist(obj: Object, options: Dictionary) -> void:
-	for prop in obj.get_property_list():
-		if prop[&"type"] != TYPE_OBJECT: continue
-		if not prop[&"usage"] & PROPERTY_USAGE_STORAGE: continue
-		if not ClassDB.is_parent_class(prop[&"class_name"], "Material"): continue
-
-		var prop_value = obj.get(prop[&"name"])
-
-		if prop_value is Mesh and options[&"resource_deep"]:
-			_convert_mesh(prop_value, options)
-			if ResourceLoader.exists(prop_value.resource_path):
-				obj.set(prop[&"name"], ResourceLoader.load(prop_value.resource_path))
-			continue
-
-		if prop_value is not Material: continue
-
-		var mat_new := _convert_material(prop_value, options)
-		if mat_new == null: continue
-
-		obj.set(prop[&"name"], mat_new)
-
-
-func _convert_material(material: Material, options: Dictionary) -> PsxMaterial3D:
-	var is_material_saved := not material.resource_path.is_empty()
-	var new_path: String
-
-	if is_material_saved:
-		new_path = material.resource_path if options[&"resource_overwrite"] else append_suffix_to_path(material.resource_path)
-		if material.resource_path != new_path and ResourceLoader.exists(new_path):
-			return load(new_path)
-	else:
-		##TODO: get from ledger if no path.
-		pass
-
-	var result := _create_psx_material_from(material, options)
-	if result == null or result == material:
-		return null
-
-	if is_material_saved:
-		result.take_over_path(new_path)
-		ResourceSaver.save(result)
-	else:
-		##TODO: store in ledger.
-		pass
-
-	return result
-
-
-func _create_psx_material_from(material: Material, options: Dictionary) -> PsxMaterial3D:
-	if material is PsxMaterial3D:
-		printerr("This Material is already a PsxMaterial3D.")
-		return null
-
-	var result: PsxMaterial3D = null
-
-	if material == null:
-		match options[&"node_replace_null_with"]:
-			0: return null
-			1: return MAT_PLACEHOLDER
-			2: return MAT_DEFAULT
-
-	if material is BaseMaterial3D:
-		result = PsxMaterial3D.new()
-
-		match material.transparency:
-			BaseMaterial3D.TRANSPARENCY_DISABLED:
-				result.transparency_mode = 0
-			BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR:
-				result.transparency_mode = 1
-			_:
-				result.transparency_mode = 2
-
-		result.shading_mode = (
-			BaseMaterial3D.SHADING_MODE_PER_VERTEX
-			if options[&"material_force_vertex_lighting"] and material.shading_mode == BaseMaterial3D.SHADING_MODE_PER_PIXEL
-			else material.shading_mode
-		)
-
-		result.fog_mode = (
-			BaseMaterial3D.SHADING_MODE_PER_VERTEX
-			if options[&"material_force_vertex_fog"] and not material.disable_fog
-			else int(not material.disable_fog)
-		)
-
-		for param in PsxMaterial3D.TRANSFERABLE_PARAMS:
-			result.set(param, material.get(param))
-
-	if material is ShaderMaterial and material.shader.get_mode() == Shader.MODE_SPATIAL:
-		result = PsxMaterial3D.new()
-
-		var transferable_params: Dictionary[String, String]
-		for uniform in material.shader.get_shader_uniform_list():
-			for param in PsxMaterial3D.TRANSFERABLE_PARAMS:
-				if not uniform[&"name"].ends_with(param): continue
-				transferable_params[uniform[&"name"]] = param
-				break
-
-		for k in transferable_params.keys():
-			var param_value = material.get_shader_parameter(k)
-			if param_value == null: continue
-
-			var start_value = result.get(transferable_params[k])
-			if start_value != null and typeof(start_value) != typeof(param_value): continue
-
-			result.set(transferable_params[k], param_value)
-
-	if result:
-		result.render_priority = material.render_priority
-		if material.next_pass:
-			result.next_pass = _create_psx_material_from(material.next_pass, options)
-
-	return result
+	if converter != null:
+		converter.queue_free()

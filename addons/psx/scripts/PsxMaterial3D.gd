@@ -4,7 +4,6 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 	&"alpha_scissor_threshold",
 	&"cull_mode",
 	&"depth_test",
-	&"vertex_color_use_as_albedo",
 	&"albedo_texture",
 	&"albedo_color",
 	&"emission_enabled",
@@ -14,7 +13,6 @@ const TRANSFERABLE_PARAMS: PackedStringArray = [
 	&"emission_on_uv2",
 	&"emission_texture",
 	&"billboard_mode",
-	&"next_pass"
 ]
 
 

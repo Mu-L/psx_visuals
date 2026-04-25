@@ -7,7 +7,7 @@
 oversampling_override = 1.0
 title = "PSX Conversion Tool"
 initial_position = 4
-size = Vector2i(504, 618)
+size = Vector2i(504, 620)
 visible = true
 ok_button_text = "Convert"
 cancel_button_text = "Go Back"
@@ -36,7 +36,7 @@ size_flags_vertical = 0
 [node name="RichTextLabel" type="Label" parent="ScrollContainer/list" unique_id=1861633557]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
-text = "This tool will automatically convert any BaseMaterial3Ds and PackedScenes currently selected in the FileSystem.
+text = "This tool will automatically convert selected objects to use PSX Visuals, by converting relevant Materials and updating their usage in other Nodes/Scenes/Resources.
 
 Warning! This action cannot be cleanly undone. Please make sure you have backed up desired content before proceeding."
 autowrap_mode = 3
@@ -47,79 +47,128 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="ScrollContainer/list" unique_id=464098254]
 layout_mode = 2
-text = "FileSystem Settings"
+text = "Conversion Selections"
 horizontal_alignment = 1
 
-[node name="include_scenes" parent="ScrollContainer/list" unique_id=316445801 instance=ExtResource("1_qjfr0")]
+[node name="convert_native_scenes" parent="ScrollContainer/list" unique_id=316445801 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, PackedScenes either in the FileSystem or local scenes in the Scene will be converted.
-If you're already converting a Node or a scene root and have this disabled, 
-this will prevent FileSystem or local scenes from being altered."
-label_text = "Include Scenes and Nodes"
+tooltip_text = "How native (.tscn, .scn, .res, etc...) PackedScenes should be converted."
+label_text = "Native Scenes"
 
-[node name="value" type="CheckBox" parent="ScrollContainer/list/include_scenes" unique_id=161502820]
+[node name="value" type="OptionButton" parent="ScrollContainer/list/convert_native_scenes" unique_id=152396126]
+layout_mode = 2
+mouse_filter = 1
+button_pressed = true
+selected = 0
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "Ignore"
+popup/item_0/id = 0
+popup/item_1/text = "Overwrite"
+popup/item_1/id = 1
+popup/item_2/text = "Create New"
+popup/item_2/id = 2
+
+[node name="convert_imported_scenes" parent="ScrollContainer/list" unique_id=1204164084 instance=ExtResource("1_qjfr0")]
+layout_mode = 2
+tooltip_text = "How imported (.gltf, .glb, .blend, etc...) PackedScenes should be converted."
+label_text = "Imported Scenes"
+
+[node name="value" type="OptionButton" parent="ScrollContainer/list/convert_imported_scenes" unique_id=351040166]
+layout_mode = 2
+mouse_filter = 1
+button_pressed = true
+selected = 1
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "Ignore"
+popup/item_0/id = 0
+popup/item_1/text = "Overwrite"
+popup/item_1/id = 1
+popup/item_2/text = "Create New"
+popup/item_2/id = 2
+
+[node name="convert_meshes" parent="ScrollContainer/list" unique_id=1112931207 instance=ExtResource("1_qjfr0")]
+layout_mode = 2
+tooltip_text = "How Meshes should be converted."
+label_text = "Meshes"
+
+[node name="value" type="OptionButton" parent="ScrollContainer/list/convert_meshes" unique_id=46251393]
+layout_mode = 2
+mouse_filter = 1
+button_pressed = true
+selected = 2
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "Ignore"
+popup/item_0/id = 0
+popup/item_1/text = "Overwrite"
+popup/item_1/id = 1
+popup/item_2/text = "Create New"
+popup/item_2/id = 2
+
+[node name="convert_base_material_3ds" parent="ScrollContainer/list" unique_id=891523843 instance=ExtResource("1_qjfr0")]
+layout_mode = 2
+tooltip_text = "How BaseMaterial3Ds should be converted."
+label_text = "BaseMaterial3Ds"
+
+[node name="value" type="OptionButton" parent="ScrollContainer/list/convert_base_material_3ds" unique_id=1640044173]
+layout_mode = 2
+mouse_filter = 1
+button_pressed = true
+selected = 2
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "Ignore"
+popup/item_0/id = 0
+popup/item_1/text = "Overwrite"
+popup/item_1/id = 1
+popup/item_2/text = "Create New"
+popup/item_2/id = 2
+
+[node name="convert_shader_materials" parent="ScrollContainer/list" unique_id=714808311 instance=ExtResource("1_qjfr0")]
+layout_mode = 2
+tooltip_text = "How ShaderMaterials should be converted.
+
+NOTE: This will attempt to convert ShaderMaterials by transfering similar-named parameters.
+If it doesn't look quite right, try converting manually."
+label_text = "ShaderMaterials"
+
+[node name="value" type="OptionButton" parent="ScrollContainer/list/convert_shader_materials" unique_id=269441423]
+layout_mode = 2
+mouse_filter = 1
+button_pressed = true
+selected = 0
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "Ignore"
+popup/item_0/id = 0
+popup/item_1/text = "Overwrite"
+popup/item_1/id = 1
+popup/item_2/text = "Create New"
+popup/item_2/id = 2
+
+[node name="convert_object_properties" parent="ScrollContainer/list" unique_id=973789654 instance=ExtResource("1_qjfr0")]
+layout_mode = 2
+tooltip_text = "If enabled, we will also check all properties on affected Nodes/Resources, looking for and converting any viable Resource values."
+label_text = "Object Properties"
+
+[node name="value" type="CheckBox" parent="ScrollContainer/list/convert_object_properties" unique_id=531208275]
 layout_mode = 2
 mouse_filter = 1
 button_pressed = true
 
-[node name="include_all_properties" parent="ScrollContainer/list" unique_id=973789654 instance=ExtResource("1_qjfr0")]
+[node name="deep" parent="ScrollContainer/list" unique_id=1673322767 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, ALL selected assets will be processed, regardless of their type. ANY Material property on ANY Node or Resource will attempt to be converted, provided that the property is a viable Material. This could take a long time."
-label_text = "Include ALL Properties"
+tooltip_text = "If enabled, we will convert all selected Nodes/Resources and any dependent Resources which we find along the way.
 
-[node name="value" type="CheckBox" parent="ScrollContainer/list/include_all_properties" unique_id=531208275]
-layout_mode = 2
-mouse_filter = 1
-
-[node name="convert_base_material_3ds" parent="ScrollContainer/list" unique_id=1756281906 instance=ExtResource("1_qjfr0")]
-visible = false
-layout_mode = 2
-tooltip_text = "If enabled, BaseMaterial3Ds will be converted."
-label_text = "Convert BaseMaterial3Ds"
-
-[node name="value" type="CheckBox" parent="ScrollContainer/list/convert_base_material_3ds" unique_id=26351942]
-layout_mode = 2
-mouse_filter = 1
-button_pressed = true
-
-[node name="convert_shader_materials" parent="ScrollContainer/list" unique_id=1649669195 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "How to convert ShaderMaterials will attempt to be converted.
-Note: This will only transfer Spatial shaders, and only for properties with matching names."
-label_text = "Convert ShaderMaterials"
-
-[node name="value" type="CheckBox" parent="ScrollContainer/list/convert_shader_materials" unique_id=1419652817]
-layout_mode = 2
-mouse_filter = 1
-
-[node name="HSeparator2" type="HSeparator" parent="ScrollContainer/list" unique_id=1050115621]
-layout_mode = 2
-
-[node name="Label2" type="Label" parent="ScrollContainer/list" unique_id=1065917634]
-layout_mode = 2
-text = "Resource Settings"
-horizontal_alignment = 1
-
-[node name="resource_overwrite" parent="ScrollContainer/list" unique_id=1216380058 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "If enabled, this will OVERWRITE existing materials in the FileSystem with a new PsxMaterial3D. If disabled, no resources in the FileSystem will be altered; only new ones will be added (with the suffix \"_psx\").
-Note: Does not apply to Materials local to a scene."
-label_text = "Overwrite Resources"
-
-[node name="value" type="CheckBox" parent="ScrollContainer/list/resource_overwrite" unique_id=1029408541]
-layout_mode = 2
-mouse_filter = 1
-
-[node name="resource_deep" parent="ScrollContainer/list" unique_id=1673322767 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "If enabled, this will attempt to replace the material(s) inside resources which a Node uses, e.g. MeshInstance3D.mesh, where it is available. This may alter other Resources in the FileSystem.
-
-If disabled or unavailable, the nearest mutable override slot in that Node will be used (surface_material_override in MeshInstance3D, material_override in others. This only affects PackedScenes/Nodes)."
+If disabled, only the selected Nodes/Resources will be modified."
 label_text = "Deep"
 
-[node name="value" type="CheckBox" parent="ScrollContainer/list/resource_deep" unique_id=832127130]
+[node name="value" type="CheckBox" parent="ScrollContainer/list/deep" unique_id=832127130]
 layout_mode = 2
 mouse_filter = 1
+button_pressed = true
 
 [node name="HSeparator3" type="HSeparator" parent="ScrollContainer/list" unique_id=146879399]
 layout_mode = 2
@@ -129,14 +178,43 @@ layout_mode = 2
 text = "Material Settings"
 horizontal_alignment = 1
 
-[node name="material_force_vertex_color" parent="ScrollContainer/list" unique_id=251834671 instance=ExtResource("1_qjfr0")]
+[node name="material_null_fallback" parent="ScrollContainer/list" unique_id=228514266 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, converted Materials will always use vertex colors as albedo."
-label_text = "Force Vertex Colors"
+tooltip_text = "If a Material property on an object has a value of null, or otherwise fails to convert, this will determine if we should replace it with something."
+label_text = "Fallback Material"
 
-[node name="value" type="CheckBox" parent="ScrollContainer/list/material_force_vertex_color" unique_id=2113953089]
+[node name="value" type="OptionButton" parent="ScrollContainer/list/material_null_fallback" unique_id=390952746]
 layout_mode = 2
 mouse_filter = 1
+button_pressed = true
+selected = 0
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Placeholder"
+popup/item_1/id = 1
+popup/item_2/text = "Default"
+popup/item_2/id = 2
+
+[node name="material_force_vertex_color" parent="ScrollContainer/list" unique_id=251834671 instance=ExtResource("1_qjfr0")]
+layout_mode = 2
+tooltip_text = "If enabled, converted Materials will use vertex colors as albedo."
+label_text = "Vertex Colors"
+
+[node name="value" type="OptionButton" parent="ScrollContainer/list/material_force_vertex_color" unique_id=1069257946]
+layout_mode = 2
+mouse_filter = 1
+button_pressed = true
+selected = 0
+fit_to_longest_item = false
+item_count = 3
+popup/item_0/text = "Ignore Setting"
+popup/item_0/id = 1
+popup/item_1/text = "Force False"
+popup/item_1/id = 0
+popup/item_2/text = "Force True"
+popup/item_2/id = 2
 
 [node name="material_force_vertex_lighting" parent="ScrollContainer/list" unique_id=1269568141 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
@@ -157,58 +235,3 @@ label_text = "Force Vertex Fog"
 layout_mode = 2
 mouse_filter = 1
 button_pressed = true
-
-[node name="HSeparator4" type="HSeparator" parent="ScrollContainer/list" unique_id=553267751]
-layout_mode = 2
-
-[node name="Label4" type="Label" parent="ScrollContainer/list" unique_id=374756303]
-layout_mode = 2
-text = "Node Settings"
-horizontal_alignment = 1
-
-[node name="node_replace_null_with" parent="ScrollContainer/list" unique_id=228514266 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "Select which kind of material to use if a MeshInstance3D has no material on its mesh or surface material overrides.
-Note: This does not affect the FileSystem; only Nodes in scenes. 
-
-Nothing: Do nothing, keep null.
-Placeholder: Replace with an ugly and very noticeable placeholder material.
-Default: Replace with a boring and less noticeable material.
-"
-label_text = "Replace Null Materials With"
-
-[node name="value" type="OptionButton" parent="ScrollContainer/list/node_replace_null_with" unique_id=390952746]
-layout_mode = 2
-mouse_filter = 1
-button_pressed = true
-selected = 0
-fit_to_longest_item = false
-item_count = 3
-popup/item_0/text = "Nothing"
-popup/item_0/id = 0
-popup/item_1/text = "Placeholder"
-popup/item_1/id = 1
-popup/item_2/text = "Default"
-popup/item_2/id = 2
-
-[node name="node_convert_override" parent="ScrollContainer/list" unique_id=1685944037 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "If enabled, GeometryInstance3D.material_override will also be converted."
-label_text = "Convert Material Overrides"
-
-[node name="value" type="CheckBox" parent="ScrollContainer/list/node_convert_override" unique_id=730325931]
-layout_mode = 2
-mouse_filter = 1
-button_pressed = true
-
-[node name="node_convert_overlay" parent="ScrollContainer/list" unique_id=589953722 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "If enabled, GeometryInstance3D.material_overlay will also be converted."
-label_text = "Convert Material Overlays"
-
-[node name="value" type="CheckBox" parent="ScrollContainer/list/node_convert_overlay" unique_id=1021344066]
-layout_mode = 2
-mouse_filter = 1
-button_pressed = true
-
-[connection signal="toggled" from="ScrollContainer/list/include_all_properties/value" to="ScrollContainer/list/include_scenes/value" method="set_disabled"]

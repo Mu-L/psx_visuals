@@ -41,9 +41,11 @@ static func property_is_resource(prop: Dictionary) -> bool:
 
 	return false
 
+static var IMPORT_DATA_REGEX := RegEx.create_from_string(r"(?m)^_subresources=\{(.*?)\}$")
+const IMPORT_DATA_PATCH := "_subresources={%s}"
 
-static func modify_resource_import_data(resource: Resource, data: Dictionary = {}, template: Resource = resource) -> void:
-	assert(ResourceLoader.exists(template.resource_path), "Can't modify import data without a file to edit.")
+static func modify_resource_import_data(resource: Resource, data: Dictionary, template: Resource = resource) -> void:
+	assert(ResourceLoader.exists(resource.resource_path), "Can't modify import data without a file to edit.")
 
 	var import_file := ConfigFile.new()
 	import_file.load(template.resource_path + ".import")
@@ -87,6 +89,12 @@ func prompt() -> bool:
 
 
 func get_convert_response(resource: Resource) -> int:
+	if resource == null or resource is PsxMaterial3D:
+		return CONVERT_NONE
+
+	if path_is_psx(resource.resource_path):
+		return CONVERT_OVERWRITE
+
 	if resource is PackedScene:
 		return options.get(&"convert_native_scenes" if resource_is_native(resource) else &"convert_imported_scenes", CONVERT_NONE)
 
@@ -95,9 +103,6 @@ func get_convert_response(resource: Resource) -> int:
 
 	if resource is BaseMaterial3D:
 		return options.get(&"convert_base_material_3ds", CONVERT_NONE)
-
-	if resource is PsxMaterial3D:
-		return CONVERT_NONE
 
 	if resource is ShaderMaterial and resource.shader.get_mode() == Shader.MODE_SPATIAL:
 		return options.get(&"convert_shader_materials", CONVERT_NONE)
@@ -110,19 +115,20 @@ func convert_nodes(nodes: Array[Node]) -> void:
 		convert_node(node)
 
 
-func convert_resource_paths(paths: PackedStringArray) -> void:
+func convert_resource_paths(paths: PackedStringArray, dir_path := "") -> void:
+	if dir_path:
+		for i in paths.size():
+			paths[i] = dir_path.path_join(paths[i])
+
 	for path in paths:
 		if DirAccess.dir_exists_absolute(path):
-			convert_resource_paths(DirAccess.get_directories_at(path))
-			convert_resource_paths(DirAccess.get_files_at(path))
+			convert_resource_paths(DirAccess.get_directories_at(path), path)
+			convert_resource_paths(DirAccess.get_files_at(path), path)
 		elif ResourceLoader.exists(path):
 			convert_resource(ResourceLoader.load(path))
-		else:
-			printerr("The path '%s' is neither a valid resource file nor a folder.")
-			continue
 
 
-func convert_resource(resource: Resource) -> Variant:
+func convert_resource(resource: Resource, new_path := "") -> Variant:
 	var response := get_convert_response(resource)
 	match response:
 		CONVERT_NONE: return resource
@@ -130,24 +136,20 @@ func convert_resource(resource: Resource) -> Variant:
 	if cache.has(resource):
 		return cache[resource]
 
-	var resource_is_saved := ResourceLoader.exists(resource.resource_path)
-	var new_path: String
+	if ResourceLoader.exists(resource.resource_path) and new_path.is_empty():
+		new_path = resource.resource_path if response == CONVERT_OVERWRITE else resource.resource_path.insert(
+			resource.resource_path.length() - resource.resource_path.get_extension().length() - 1,
+			PSX_SUFFIX
+		)
 
-	if resource_is_saved:
-		if path_is_psx(resource.resource_path):
-			return resource
-
-		new_path = resource.resource_path if response == CONVERT_OVERWRITE else resource.resource_path.insert(-resource.resource_path.get_extension().length() - 1, PSX_SUFFIX)
-
-		if resource.resource_path != new_path and ResourceLoader.exists(new_path):
-			assert(path_is_psx(new_path))
-			cache[resource] = ResourceLoader.load(new_path)
-			return cache[resource]
+	if resource.resource_path != new_path and ResourceLoader.exists(new_path):
+		cache[resource] = ResourceLoader.load(new_path)
+		return cache[resource]
 
 	var result: Variant = null
 
 	if resource is PackedScene:
-		result = convert_scene_from(resource)
+		result = convert_scene_from(resource, new_path)
 
 	elif resource is Mesh:
 		result = convert_mesh_from(resource)
@@ -161,33 +163,40 @@ func convert_resource(resource: Resource) -> Variant:
 	if options.get(&"convert_object_properties", true):
 		convert_object_plist(result)
 
-	if resource_is_saved:
+	if new_path.is_empty():
+		cache[resource] = result
+	else:
 		result.take_over_path(new_path)
 		ResourceSaver.save(result)
 		cache[resource] = ResourceLoader.load(new_path)
-	else:
-		cache[resource] = result
 
 	return cache[resource]
 
 
-func convert_scene_from(scene: PackedScene) -> PackedScene:
+func convert_scene_from(scene: PackedScene, new_path: String) -> PackedScene:
 	var root := scene.instantiate(PackedScene.GEN_EDIT_STATE_INSTANCE)
-	var result := PackedScene.new()
+	var result: PackedScene
 
 	if resource_is_native(scene):
 		convert_tree(root)
 
+		result = PackedScene.new()
 		var err := result.pack(root)
 
 	else:
+		match options[&"convert_imported_scenes"]:
+			CONVERT_NONE: return
+			CONVERT_OVERWRITE: result = scene
+			CONVERT_CREATE_NEW:
+				result = scene.duplicate()
+				DirAccess.copy_absolute(scene.resource_path, new_path)
+				result.take_over_path(new_path)
+
 		var materials := get_materials_used_in_tree(root)
+
 		var data: Dictionary
 		for k in materials:
-			var converted_material := convert_resource(materials[k])
-
-			if not ResourceLoader.exists(converted_material.resource_path):
-				converted_material.take_over_path("res://%s.tres" % k)
+			var converted_material := convert_resource(materials[k], "res://%s%s.tres" % [k, PSX_SUFFIX])
 
 			data[k] = {
 				"use_external/enabled": true,
@@ -254,10 +263,13 @@ func convert_object_plist(obj: Object) -> void:
 
 func get_materials_used_in_tree(node: Node, root: Node = node) -> Dictionary:
 	var result: Dictionary
+
+	if node is MeshInstance3D:
+		for i in node.mesh.get_surface_count():
+			result[node.mesh["surface_%s/name" % str(i)]] = node.mesh.surface_get_material(i)
+
 	for child in node.get_children():
-		if child.owner == root and node is MeshInstance3D:
-			for i in node.mesh.get_surface_count():
-				result[node.mesh["surface_%s/name" % str(i)]] = node.mesh.surface_get_material(i)
+		if child.owner != root: continue
 
 		result.merge(get_materials_used_in_tree(child, root))
 

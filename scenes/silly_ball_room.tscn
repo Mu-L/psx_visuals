@@ -173,10 +173,13 @@ initial_velocity_max = 10.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]
 
-[node name="radio2" parent="." unique_id=1747541452 instance=ExtResource("12_3c5kg")]
+[node name="radio2" parent="." unique_id=547690333 instance=ExtResource("12_3c5kg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20465183, 4.4808154, 3.058625)
 visible = false
 
-[node name="radio3" parent="." unique_id=869495431 instance=ExtResource("13_7xr1c")]
+[node name="radio3" parent="." unique_id=711847315 instance=ExtResource("13_7xr1c")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0675154, 4.4843016, 3.074855)
 visible = false
+
+[node name="radio4" parent="." unique_id=1477076530 instance=ExtResource("13_7xr1c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2318064, 4.000001, 2.6782298)

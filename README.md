@@ -93,21 +93,14 @@ This value controls at which distance the fog should reach full transparency. Th
 
 This component recreates the effect of vertices being limited to integer screen pixels. It is controlled by the `psx_snap_distance` shader global. The default value is `1.0`. Higher values will increase the effect. `0.0` will disable the effect.
 
-## Conversion Wizard
+## Conversion Tool
 
-In a PSX-style game, you will want to use a PSX material on almost all `MeshInstance3D`s in every 3D scene. You can do this manually, but this can take lots of time. The Conversion Wizard is a tool that can help you convert scenes, materials, or an entire project into PSX.
+In a PSX-style game, you will want to use a PSX material on almost all `MeshInstance3D`s in every 3D scene. You can do this manually, but this can take lots of time. The Conversion Tool can help you convert desired resources or specific nodes into PSX.
 
 > [!CAUTION]
 > Using the conversion Wizard is currently irreversible. Make a backup or VCS commit of your project before using.
 
-Keep in mind during the conversion process:
-
-<!-- - If the `Node.owner` is not the scene root, the `Node` will not be processed. -->
-- You can add a meta value named `psx_ignore` of type `bool` to any Node to control if the Wizard should modify any `Node`.
-	- If `null` or not present, the converter will process the `Node` normally.
-	- If `false`, the converter will ignore THIS `Node`, but will continue on to its children.
-	- If `true`, the converter will ignore this `Node`, AND ALL its children.
-- You can add a meta value named `psx_auto` of type `Material` to the root of any scene to enforce
+Each Node now has a new field called "PSX Ignore" in `Node > Editor Description`. Use this to change which Nodes are processed. Beware! If you convert a resource that a Node uses, it will be affected whether or not it is ignored.
 
 # Visual Features Reference
 

@@ -143,8 +143,8 @@ const GLOBAL_VARS := {
 		"value": 1.0,
 	},
 	&"psx_bit_depth": {
-		"rtype": RenderingServer.GLOBAL_VAR_TYPE_UINT,
-		"type": "uint",
+		"rtype": RenderingServer.GLOBAL_VAR_TYPE_INT,
+		"type": "int",
 		"value": 5,
 	},
 	&"psx_fog_color": {

@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://cxvwilg7m23wl"]
 
 [ext_resource type="Script" uid="uid://j6si3eotee6o" path="res://scenes/SillyBall.gd" id="1_etg74"]
-[ext_resource type="Material" uid="uid://drgm0tmni178j" path="res://addons/psx/materials/psx_mat_default.tres" id="2_txpge"]
 [ext_resource type="Script" uid="uid://bq5vw344iydkr" path="res://addons/psx/scripts/RayShadowCaster.gd" id="3_etg74"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_o5qli"]
@@ -17,11 +16,7 @@ change_interval = Vector2(0.8, 1.6)
 speed_range = Vector2(10, 20)
 
 [node name="mesh" type="MeshInstance3D" parent="." unique_id=809775467]
-instance_shader_parameters/i_precision_uv = 1.0
-instance_shader_parameters/i_precision_xy = 1.0
-instance_shader_parameters/i_precision_z = 1.0
 mesh = SubResource("SphereMesh_o5qli")
-surface_material_override/0 = ExtResource("2_txpge")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=259735888]
 shape = SubResource("SphereShape3D_tbgi4")

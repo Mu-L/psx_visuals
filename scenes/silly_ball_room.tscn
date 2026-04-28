@@ -1,18 +1,11 @@
-[gd_scene format=3 uid="uid://idih6fnmi6lk"]
+[gd_scene format=3 uid="uid://n5lg8ffunm8k"]
 
-[ext_resource type="Texture2D" uid="uid://blpwynvjwergx" path="res://icon.png" id="1_k40lg"]
-[ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="2_jji0g"]
-[ext_resource type="Shader" uid="uid://cbjxdnph5jcmg" path="res://addons/psx/shaders/cache/psx_00000.gdshader" id="3_xyxjq"]
-[ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="4_w0d5b"]
-[ext_resource type="Material" uid="uid://dueuwdraosbov" path="res://addons/psx/materials/psx_mat_shadow_32x32.tres" id="5_27lka"]
-[ext_resource type="Material" uid="uid://c5volcllr43l7" path="res://addons/psx/materials/psx_mat_placeholder.tres" id="6_ygxbt"]
-[ext_resource type="Shader" uid="uid://ck4iesh8rh06q" path="res://addons/psx/shaders/cache/psx_00172.gdshader" id="7_fkvve"]
-[ext_resource type="Shader" uid="uid://bqd6x1i4epygl" path="res://addons/psx/shaders/cache/psx_00168.gdshader" id="8_cf5bn"]
-[ext_resource type="Shader" uid="uid://0pjygjxmns4k" path="res://addons/psx/shaders/cache/psx_00735.gdshader" id="9_m3aq4"]
-[ext_resource type="Shader" uid="uid://d347fbfxsfbx5" path="res://addons/psx/shaders/cache/psx_00182.gdshader" id="10_nvlvv"]
-[ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="11_vemvr"]
-[ext_resource type="PackedScene" uid="uid://b3wh28wasout3" path="res://test/Assets/gltf/radio2.gltf" id="12_koc1e"]
-[ext_resource type="PackedScene" uid="uid://wjjffpu6jqe8" path="res://test/Assets/gltf/radio.gltf" id="13_brpmh"]
+[ext_resource type="Material" uid="uid://do05cdjiu5ax3" path="res://test/scaryman.tres" id="1_8l7eo"]
+[ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="3_s7nt7"]
+[ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="4_pxfo5"]
+[ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="11_qnkwp"]
+[ext_resource type="PackedScene" uid="uid://b3wh28wasout3" path="res://test/Assets/gltf/radio2.gltf" id="12_3c5kg"]
+[ext_resource type="PackedScene" uid="uid://wjjffpu6jqe8" path="res://test/Assets/gltf/radio.gltf" id="13_7xr1c"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -33,43 +26,31 @@ size = Vector2(10, 10)
 subdivide_width = 3
 subdivide_depth = 3
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_85g3d"]
-render_priority = 0
-shader = ExtResource("3_xyxjq")
-shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_texture = ExtResource("1_k40lg")
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-script = ExtResource("2_jji0g")
-shading_mode = 0
-fog_mode = 0
-albedo_texture = ExtResource("1_k40lg")
-metadata/_custom_type_script = "uid://cb12verrfoj5k"
-
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_jkv2x"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kmq80"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.5019608)
+albedo_texture = ExtResource("3_s7nt7")
+texture_filter = 0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_jbj1t"]
-render_priority = 0
-shader = ExtResource("7_fkvve")
-shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_texture = SubResource("PlaceholderTexture2D_jkv2x")
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-script = ExtResource("2_jji0g")
-albedo_texture = SubResource("PlaceholderTexture2D_jkv2x")
-billboard_mode = 2
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_2rg2p"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b3x3c"]
+albedo_texture = SubResource("PlaceholderTexture2D_2rg2p")
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aa1un"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s7nt7"]
+albedo_texture = SubResource("PlaceholderTexture2D_2rg2p")
+texture_filter = 0
+billboard_mode = 1
 billboard_keep_scale = true
-metadata/_custom_type_script = "uid://cb12verrfoj5k"
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tefeu"]
-render_priority = 0
-shader = ExtResource("8_cf5bn")
-shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_texture = ExtResource("1_k40lg")
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-script = ExtResource("2_jji0g")
-albedo_texture = ExtResource("1_k40lg")
-emission = Color(1, 1, 1, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3735b"]
+albedo_texture = SubResource("PlaceholderTexture2D_2rg2p")
+texture_filter = 0
 
 [sub_resource type="GDScript" id="GDScript_tefeu"]
 resource_name = "spinny"
@@ -85,39 +66,14 @@ func _process(delta: float) -> void:
 radial_segments = 8
 rings = 3
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ya4ey"]
-render_priority = 0
-shader = ExtResource("9_m3aq4")
-shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_texture = ExtResource("1_k40lg")
-shader_parameter/u_albedo_color = Color(0.49, 0.49, 0.49, 1)
-script = ExtResource("2_jji0g")
-cull_mode = 1
-albedo_texture = ExtResource("1_k40lg")
-albedo_color = Color(0.49, 0.49, 0.49, 1)
-emission = Color(1, 1, 1, 1)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_muem4"]
-render_priority = 0
-shader = ExtResource("10_nvlvv")
-shader_parameter/u_vertex_color_use_as_albedo = true
-shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
-shader_parameter/u_emission = Color(1, 1, 1, 1)
-shader_parameter/u_emission_energy_multiplier = 2.0
-shader_parameter/u_emission_on_uv2 = false
-script = ExtResource("2_jji0g")
-emission_enabled = true
-emission = Color(1, 1, 1, 1)
-emission_energy_multiplier = 2.0
-emission_operator = 1
-metadata/_custom_type_script = "uid://cb12verrfoj5k"
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yf6l0"]
 
 [sub_resource type="Gradient" id="Gradient_choun"]
 offsets = PackedFloat32Array(0)
 colors = PackedColorArray(1, 1, 1, 1)
 
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_ya4ey"]
-script = ExtResource("11_vemvr")
+script = ExtResource("11_qnkwp")
 points = PackedVector3Array(0, 0, 0, 0, 1, 0)
 color_gradient = SubResource("Gradient_choun")
 metadata/_custom_type_script = "uid://bhof12h30k66g"
@@ -136,53 +92,51 @@ environment = SubResource("Environment_tipki")
 [node name="RigidBody3D4" type="StaticBody3D" parent="." unique_id=2080832859]
 
 [node name="MeshInstance3D5" type="MeshInstance3D" parent="RigidBody3D4" unique_id=849679747]
+transform = Transform3D(1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0)
 mesh = SubResource("PlaneMesh_tefeu")
-surface_material_override/0 = SubResource("ShaderMaterial_85g3d")
+surface_material_override/0 = ExtResource("1_8l7eo")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4" unique_id=1956428608]
 shape = SubResource("WorldBoundaryShape3D_tefeu")
 
-[node name="silly_ball" parent="." unique_id=1375805931 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball" parent="." unique_id=1375805931 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
 
-[node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-material = ExtResource("5_27lka")
+material = SubResource("StandardMaterial3D_kmq80")
 
-[node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball3" parent="." unique_id=1156119337 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
-material = ExtResource("6_ygxbt")
+material = SubResource("StandardMaterial3D_b3x3c")
+metadata/_psx_ignore = 1
 
-[node name="silly_ball4" parent="." unique_id=1547077677 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball4" parent="." unique_id=1547077677 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(-0.84724253, 0.14471734, 0.5111134, 0.2471979, 0.95905644, 0.13821684, -0.47018424, 0.24344935, -0.8483273, -2, 2, 2)
-material = SubResource("ShaderMaterial_jbj1t")
+material = SubResource("StandardMaterial3D_aa1un")
 
-[node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
-material = SubResource("ShaderMaterial_tefeu")
+material = ExtResource("1_8l7eo")
 precision_uv = 0.5
 precision_xy = 0.5
 precision_z = 0.5
 precision_all = 0.5
 
-[node name="silly_ball6" parent="." unique_id=1329159422 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball6" parent="." unique_id=1329159422 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
-material = ExtResource("6_ygxbt")
+material = SubResource("StandardMaterial3D_s7nt7")
 
-[node name="silly_ball7" parent="." unique_id=624434434 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball7" parent="." unique_id=624434434 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
 
-[node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
-material = SubResource("ShaderMaterial_tefeu")
-precision_uv = 0.2
-precision_xy = 0.2
-precision_z = 0.2
-precision_all = 0.2
+material = ExtResource("1_8l7eo")
 
-[node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("4_w0d5b")]
+[node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
-material = ExtResource("6_ygxbt")
+material = SubResource("StandardMaterial3D_3735b")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=1736152543]
 script = SubResource("GDScript_tefeu")
@@ -200,12 +154,11 @@ transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.58500
 
 [node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
 transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, -0.9999995, 0)
-visible = false
 mesh = SubResource("SphereMesh_choun")
-surface_material_override/0 = SubResource("ShaderMaterial_ya4ey")
+surface_material_override/0 = ExtResource("1_8l7eo")
 
 [node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=1765450839]
-material_override = SubResource("ShaderMaterial_muem4")
+material_override = SubResource("StandardMaterial3D_yf6l0")
 mesh = SubResource("ImmediateMesh_ya4ey")
 emission_shape = 6
 emission_ring_axis = Vector3(0, 1, 0)
@@ -220,8 +173,10 @@ initial_velocity_max = 10.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]
 
-[node name="radio2" parent="." unique_id=1747541452 instance=ExtResource("12_koc1e")]
+[node name="radio2" parent="." unique_id=1747541452 instance=ExtResource("12_3c5kg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20465183, 4.4808154, 3.058625)
+visible = false
 
-[node name="radio3" parent="." unique_id=869495431 instance=ExtResource("13_brpmh")]
+[node name="radio3" parent="." unique_id=869495431 instance=ExtResource("13_7xr1c")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0675154, 4.4843016, 3.074855)
+visible = false

@@ -105,26 +105,31 @@ class PsxInspectorPlugin extends EditorInspectorPlugin:
 func COMMAND_convert_entire_project() -> void:
 	if not await converter.prompt(): return
 	converter.convert_resource_paths(["res://"])
+	get_editor_interface().save_all_scenes()
 
 
 func COMMAND_convert_current_scene() -> void:
 	if not await converter.prompt(): return
 	converter.convert_tree(get_editor_interface().get_edited_scene_root())
+	get_editor_interface().mark_scene_as_unsaved()
 
 
 func COMMAND_convert_selected_nodes() -> void:
 	if not await converter.prompt(): return
 	converter.convert_nodes(get_editor_interface().get_selection().get_selected_nodes())
+	get_editor_interface().mark_scene_as_unsaved()
 
 
 func CONTEXT_convert_selected_paths(paths: Array) -> void:
 	if not await converter.prompt(): return
 	converter.convert_resource_paths(paths)
+	get_editor_interface().save_all_scenes()
 
 
 func CONTEXT_convert_selected_nodes(nodes: Array) -> void:
 	if not await converter.prompt(): return
 	converter.convert_nodes(nodes)
+	get_editor_interface().mark_scene_as_unsaved()
 
 #endregion
 

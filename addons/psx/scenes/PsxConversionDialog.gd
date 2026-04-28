@@ -88,7 +88,7 @@ func prompt() -> bool:
 
 func get_convert_response(resource: Resource) -> int:
 	if resource is PackedScene:
-		return options.get(&"convert_native_scenes" if resource_is_native(resource) else &"convert_", CONVERT_NONE)
+		return options.get(&"convert_native_scenes" if resource_is_native(resource) else &"convert_imported_scenes", CONVERT_NONE)
 
 	if resource is Mesh:
 		return options.get(&"convert_meshes", CONVERT_NONE)
@@ -185,6 +185,10 @@ func convert_scene_from(scene: PackedScene) -> PackedScene:
 		var data: Dictionary
 		for k in materials:
 			var converted_material := convert_resource(materials[k])
+
+			if not ResourceLoader.exists(converted_material.resource_path):
+				converted_material.take_over_path("res://%s.tres" % k)
+
 			data[k] = {
 				"use_external/enabled": true,
 				"use_external/fallback_path": converted_material.resource_path,

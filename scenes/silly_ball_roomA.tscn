@@ -1,17 +1,17 @@
 [gd_scene format=3 uid="uid://dg02dtuy2gt83"]
 
 [ext_resource type="Material" uid="uid://bpp50d5phh2m0" path="res://test/scaryman_psx.tres" id="1_00umy"]
+[ext_resource type="Script" uid="uid://cwo3ld44ocipw" path="res://addons/psx/scripts/PsxEnvironment.gd" id="1_ow7br"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="2_k2hjv"]
 [ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="3_inbau"]
 [ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="4_b8eox"]
 [ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="4_g6y8m"]
-[ext_resource type="PackedScene" uid="uid://b3wh28wasout3" path="res://test/Assets/gltf/radio2.gltf" id="5_00umy"]
-[ext_resource type="Shader" uid="uid://dakqcoo77bwip" path="res://addons/psx/shaders/cache/psx_03570.gdshader" id="5_ow7br"]
-[ext_resource type="PackedScene" uid="uid://wjjffpu6jqe8" path="res://test/Assets/gltf/radio.gltf" id="6_b8eox"]
-[ext_resource type="Shader" uid="uid://barxr2beheijm" path="res://addons/psx/shaders/cache/psx_00168.gdshader" id="6_le4ex"]
-[ext_resource type="Shader" uid="uid://ciry2br5bnuue" path="res://addons/psx/shaders/cache/psx_00169.gdshader" id="8_b8eox"]
+[ext_resource type="Shader" uid="uid://b80w2cea6rxfg" path="res://addons/psx/shaders/cache/psx_04746.gdshader" id="5_ow7br"]
+[ext_resource type="Shader" uid="uid://bb7ox3cjecbjl" path="res://addons/psx/shaders/cache/psx_00210.gdshader" id="6_le4ex"]
+[ext_resource type="Shader" uid="uid://cc5u4tg6j3v7j" path="res://addons/psx/shaders/cache/psx_00211.gdshader" id="7_bbydb"]
+[ext_resource type="Shader" uid="uid://dli5r41kde8j" path="res://addons/psx/shaders/cache/psx_00231.gdshader" id="8_le4ex"]
 [ext_resource type="Texture2D" uid="uid://blpwynvjwergx" path="res://icon.png" id="8_ow7br"]
-[ext_resource type="Shader" uid="uid://cv6usf1xrodgs" path="res://addons/psx/shaders/cache/psx_01176.gdshader" id="9_le4ex"]
+[ext_resource type="Shader" uid="uid://8soxhoiouhhv" path="res://addons/psx/shaders/cache/psx_01743.gdshader" id="10_bbydb"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -30,12 +30,25 @@ fog_enabled = true
 fog_mode = 1
 fog_light_color = Color(0.3066, 0.35006997, 0.42, 1)
 fog_density = 1.0
-fog_depth_end = 16.0
+fog_depth_begin = 24.0
+fog_depth_end = 32.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ke4r6"]
 size = Vector2(10, 10)
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_le4ex"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ke4r6"]
+render_priority = 0
+shader = ExtResource("6_le4ex")
+shader_parameter/u_vertex_color_use_as_albedo = true
+shader_parameter/u_albedo_texture = SubResource("PlaceholderTexture2D_le4ex")
+shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
+script = ExtResource("4_b8eox")
+albedo_texture = SubResource("PlaceholderTexture2D_le4ex")
+metadata/_custom_type_script = "uid://cb12verrfoj5k"
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_t1xdd"]
 render_priority = 0
@@ -65,7 +78,7 @@ vertex_color_use_as_albedo = false
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3y7cf"]
 render_priority = 0
-shader = ExtResource("8_b8eox")
+shader = ExtResource("7_bbydb")
 shader_parameter/u_vertex_color_use_as_albedo = false
 shader_parameter/u_albedo_texture = SubResource("PlaceholderTexture2D_2rg2p")
 shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
@@ -76,11 +89,12 @@ billboard_mode = 1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7ijgt"]
 render_priority = 0
-shader = ExtResource("6_le4ex")
+shader = ExtResource("8_le4ex")
 shader_parameter/u_vertex_color_use_as_albedo = false
 shader_parameter/u_albedo_texture = SubResource("PlaceholderTexture2D_2rg2p")
 shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
 script = ExtResource("4_b8eox")
+fog_mode = 3
 vertex_color_use_as_albedo = false
 albedo_texture = SubResource("PlaceholderTexture2D_2rg2p")
 
@@ -94,19 +108,18 @@ func _process(delta: float) -> void:
 	rotation_degrees.y += speed * delta
 "
 
-[sub_resource type="SphereMesh" id="SphereMesh_q05s1"]
-radial_segments = 24
-rings = 13
+[sub_resource type="BoxMesh" id="BoxMesh_bbydb"]
+size = Vector3(1000, 1000, 1000)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bbydb"]
 render_priority = 0
-shader = ExtResource("9_le4ex")
+shader = ExtResource("10_bbydb")
 shader_parameter/u_vertex_color_use_as_albedo = false
 shader_parameter/u_albedo_texture = ExtResource("8_ow7br")
 shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
 script = ExtResource("4_b8eox")
 cull_mode = 2
-shading_mode = 0
+fog_mode = 3
 vertex_color_use_as_albedo = false
 albedo_texture = ExtResource("8_ow7br")
 
@@ -147,12 +160,14 @@ material = SubResource("ShaderMaterial_v7yua")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=374673350]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+visible = false
 light_energy = 0.25
 shadow_enabled = true
 directional_shadow_pancake_size = 266.8
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2115240103]
 environment = SubResource("Environment_tipki")
+script = ExtResource("1_ow7br")
 
 [node name="RigidBody3D4" type="StaticBody3D" parent="." unique_id=2080832859]
 
@@ -166,6 +181,7 @@ shape = SubResource("WorldBoundaryShape3D_tefeu")
 
 [node name="silly_ball" parent="." unique_id=1375805931 instance=ExtResource("2_k2hjv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
+material = SubResource("ShaderMaterial_ke4r6")
 
 [node name="silly_ball2" parent="." unique_id=1470817939 instance=ExtResource("2_k2hjv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
@@ -220,8 +236,8 @@ transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.58500
 visible = false
 
 [node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
-transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, -0.06996918, -1.0500007, 0.005924225)
-mesh = SubResource("SphereMesh_q05s1")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06996918, -1.0500007, 0.005924225)
+mesh = SubResource("BoxMesh_bbydb")
 surface_material_override/0 = SubResource("ShaderMaterial_bbydb")
 
 [node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=1765450839]
@@ -240,17 +256,7 @@ initial_velocity_max = 10.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+visible = false
 transform_align = 1
 process_material = SubResource("ParticleProcessMaterial_8l7eo")
 draw_pass_1 = SubResource("QuadMesh_1qnen")
-
-[node name="radio2" parent="." unique_id=547690333 instance=ExtResource("5_00umy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20465183, 4.4808154, 3.058625)
-visible = false
-
-[node name="radio3" parent="." unique_id=711847315 instance=ExtResource("6_b8eox")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0675154, 4.4843016, 3.074855)
-visible = false
-
-[node name="radio4" parent="." unique_id=1477076530 instance=ExtResource("6_b8eox")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2318064, 4.000001, 2.6782298)

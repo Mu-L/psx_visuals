@@ -34,7 +34,7 @@ uniform bool u_emission_on_uv2 = false;
 uniform sampler2D u_emission_texture: hint_default_black, filter_nearest;
 #endif
 
-#ifdef VERTEX_FOG_ENABLED
+#if (defined VERTEX_FOG_ENABLED) || (defined VERTEX_FOG_ALWAYS)
 global uniform vec4 psx_fog_color;
 global uniform float psx_fog_far;
 global uniform float psx_fog_near;
@@ -117,11 +117,13 @@ void vertex() {
 	v_uv = UV * v_clip.w;
 	v_uv2 = UV2 * v_clip.w;
 
-#ifdef VERTEX_FOG_ENABLED
+#if defined VERTEX_FOG_ENABLED
 	v_fog_strength = psx_fog_near != psx_fog_far ?
-		psx_fog_color.a * clamp((v_clip.w - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
+		clamp((v_clip.w - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
 		0.0;
-	v_fog_color = mix(vec3(0), psx_fog_color.rgb, v_fog_strength);
+	v_fog_color = psx_fog_color.rgb * psx_fog_color.a;
+#elif defined VERTEX_FOG_ALWAYS
+	v_fog_color = psx_fog_color.rgb * psx_fog_color.a;
 #endif
 }
 
@@ -156,8 +158,14 @@ void fragment() {
 	EMISSION = emission * u_emission_energy_multiplier;
 #endif
 
-#ifdef VERTEX_FOG_ENABLED
-	ALBEDO = albedo.rgb * (1.0 - v_fog_strength) + v_fog_color;
+#if defined VERTEX_FOG_ENABLED
+	NORMAL = mix(NORMAL, vec3(0.0, 0.0, -1.0), v_fog_strength);
+	ALBEDO = mix(albedo.rgb, v_fog_color, v_fog_strength);
+	//ALBEDO = albedo.rgb * (1.0 - v_fog_strength) + v_fog_color;
+	EMISSION += v_fog_color * v_fog_strength;
+#elif defined VERTEX_FOG_ALWAYS
+	NORMAL = vec3(0.0, 0.0, -1.0);
+	ALBEDO = v_fog_color;
 	EMISSION += v_fog_color;
 #else
 	ALBEDO = albedo.rgb;
@@ -166,5 +174,4 @@ void fragment() {
 	SPECULAR = 0.0;
 	ROUGHNESS = 0.0;
 	METALLIC = 0.0;
-	AO = 1.0;
 }

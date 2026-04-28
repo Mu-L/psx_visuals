@@ -1,5 +1,16 @@
 @tool class_name PsxMaterial3D extends ShaderMaterial
 
+enum FogMode {
+	## No fog of any kind will be applied.
+	DISABLED,
+	## Regular, non-PSX, per-pixel fog will be used.
+	PER_PIXEL,
+	## This is the default value for PSX-style fog.
+	PER_VERTEX,
+	## Vertex fog will always be applied regardless of distance. For use in things like skyboxes. Use with vertex lighting for a complete effect.
+	ALWAYS,
+}
+
 const TRANSFERABLE_PARAMS: PackedStringArray = [
 	&"alpha_scissor_threshold",
 	&"cull_mode",
@@ -28,7 +39,7 @@ const SHADER_FLAGS := [
 	["cull_back", "cull_front", "cull_disabled"],
 	["depth_test_default", "depth_test_inverted", "depth_test_disabled"],
 	["unshaded", "", "vertex_lighting"],
-	["fog_disabled", "", "#VERTEX_FOG_ENABLED"],
+	["fog_disabled", "", "fog_disabled,#VERTEX_FOG_ENABLED", "fog_disabled,#VERTEX_FOG_ALWAYS"],
 	["", "#EMISSION_ADD", "#EMISSION_MULTIPLY"],
 	[
 		"#BILLBOARD_DISABLED",
@@ -41,7 +52,7 @@ const SHADER_FLAGS := [
 	],
 ]
 
-static var SHADER_DEFAULT_INDEX := 168
+static var SHADER_DEFAULT_INDEX := 210
 static var SHADER_FLAGS_PERMUTATION_SIZES: PackedInt32Array
 static var SHADER_FLAGS_CACHE: PackedStringArray
 static var SHADER_CACHE: Dictionary[int, Shader]
@@ -133,10 +144,6 @@ static func _static_init() -> void:
 
 #endregion
 
-## A list of [Material]s that have previously been converted into this one. Used in the editor; should not be exported/used in an exported game. But, here for your convenience.
-@export_custom(PROPERTY_HINT_ARRAY_TYPE, "Material", PROPERTY_USAGE_NONE | PROPERTY_USAGE_EDITOR) var convert_materials: Array[Material]
-
-
 @export_subgroup("Transparency")
 
 @export_enum("Opaque", "Cutout", "Transparent") var transparency_mode: int = 0:
@@ -172,7 +179,7 @@ static func _static_init() -> void:
 		refresh_shader()
 
 
-@export_enum("Disabled", "Per-Pixel", "Per-Vertex") var fog_mode: int = 2:
+@export var fog_mode: FogMode = FogMode.PER_VERTEX:
 	set(value):
 		fog_mode = value
 		refresh_shader()

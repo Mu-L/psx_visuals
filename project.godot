@@ -140,7 +140,7 @@ psx_affine_strength={
 }
 psx_fog_color={
 "type": "color",
-"value": Color(0.5, 0.5, 0.5, 0.2509804)
+"value": Color(0.21, 0.21, 0.21, 1)
 }
 psx_fog_far={
 "type": "float",
@@ -156,11 +156,11 @@ psx_precision_uv={
 }
 psx_precision_xy={
 "type": "float",
-"value": 128.0
+"value": 256.0
 }
 psx_precision_z={
 "type": "float",
-"value": 1024.0
+"value": 512.0
 }
 psx_bit_depth={
 "type": "int",

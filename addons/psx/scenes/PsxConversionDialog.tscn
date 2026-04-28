@@ -8,6 +8,7 @@ oversampling_override = 1.0
 title = "PSX Conversion Tool"
 initial_position = 4
 size = Vector2i(504, 620)
+visible = true
 ok_button_text = "Convert"
 cancel_button_text = "Go Back"
 script = ExtResource("1_a1rjm")
@@ -18,8 +19,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 8.0
 offset_top = 8.0
-offset_right = 496.0
-offset_bottom = 571.0
+offset_right = -8.0
+offset_bottom = -49.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -51,7 +52,7 @@ horizontal_alignment = 1
 
 [node name="convert_native_scenes" parent="ScrollContainer/list" unique_id=316445801 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "How native (.tscn, .scn, .res, etc...) PackedScenes should be converted."
+tooltip_text = "If this is set, native scenes (.tscn, etc.) will be eligible for conversion. This will iterate through each node in the scene and modify various GeometryInstance3D nodes."
 label_text = "Native Scenes"
 
 [node name="value" type="OptionButton" parent="ScrollContainer/list/convert_native_scenes" unique_id=152396126]
@@ -70,7 +71,7 @@ popup/item_2/id = 2
 
 [node name="convert_imported_scenes" parent="ScrollContainer/list" unique_id=1204164084 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "How imported (.gltf, .glb, .blend, etc...) PackedScenes should be converted."
+tooltip_text = "If this is set, imported scenes (.gltf, .glb, .blend, etc.) will be eligible for conversion. This will create new Materials for each material slot name in the scene and assign the scene to use an External material."
 label_text = "Imported Scenes"
 
 [node name="value" type="OptionButton" parent="ScrollContainer/list/convert_imported_scenes" unique_id=351040166]
@@ -89,7 +90,7 @@ popup/item_2/id = 2
 
 [node name="convert_meshes" parent="ScrollContainer/list" unique_id=1112931207 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "How Meshes should be converted."
+tooltip_text = "If this is set, Mesh resources will be eligible for conversion. This will convert materials in each non-null surface material slot."
 label_text = "Meshes"
 
 [node name="value" type="OptionButton" parent="ScrollContainer/list/convert_meshes" unique_id=46251393]
@@ -108,7 +109,7 @@ popup/item_2/id = 2
 
 [node name="convert_base_material_3ds" parent="ScrollContainer/list" unique_id=891523843 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "How BaseMaterial3Ds should be converted."
+tooltip_text = "If this is set, BaseMaterial3D resources will be eligible for conversion. This will create a new PsxMaterial3D based on the properties of the BaseMaterial3D."
 label_text = "BaseMaterial3Ds"
 
 [node name="value" type="OptionButton" parent="ScrollContainer/list/convert_base_material_3ds" unique_id=1640044173]
@@ -127,10 +128,7 @@ popup/item_2/id = 2
 
 [node name="convert_shader_materials" parent="ScrollContainer/list" unique_id=714808311 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "How ShaderMaterials should be converted.
-
-NOTE: This will attempt to convert ShaderMaterials by transfering similar-named parameters.
-If it doesn't look quite right, try converting manually."
+tooltip_text = "If this is set, ShaderMaterial resources will be eligible for conversion. This will attempt to transfer similarly-named properties on the ShaderMaterial to a newly created PsxMaterial3D."
 label_text = "ShaderMaterials"
 
 [node name="value" type="OptionButton" parent="ScrollContainer/list/convert_shader_materials" unique_id=269441423]
@@ -149,22 +147,10 @@ popup/item_2/id = 2
 
 [node name="convert_object_properties" parent="ScrollContainer/list" unique_id=973789654 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, we will also check all properties on affected Nodes/Resources, looking for and converting any viable Resource values."
+tooltip_text = "If enabled, this will iterate through all object properties of every Resource and Node touched, and attempt to convert any Materials found in them."
 label_text = "Object Properties"
 
 [node name="value" type="CheckBox" parent="ScrollContainer/list/convert_object_properties" unique_id=531208275]
-layout_mode = 2
-mouse_filter = 1
-button_pressed = true
-
-[node name="deep" parent="ScrollContainer/list" unique_id=1673322767 instance=ExtResource("1_qjfr0")]
-layout_mode = 2
-tooltip_text = "If enabled, we will convert all selected Nodes/Resources and any dependent Resources which we find along the way.
-
-If disabled, only the selected Nodes/Resources will be modified."
-label_text = "Deep"
-
-[node name="value" type="CheckBox" parent="ScrollContainer/list/deep" unique_id=832127130]
 layout_mode = 2
 mouse_filter = 1
 button_pressed = true
@@ -179,7 +165,10 @@ horizontal_alignment = 1
 
 [node name="material_force_vertex_color" parent="ScrollContainer/list" unique_id=251834671 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, converted Materials will use vertex colors as albedo."
+tooltip_text = "This setting affects Gouraud Shading in PsxMaterial3Ds.
+Ignore will not change this value in any new materials.
+Force False will force this value to be false in all new PsxMaterial3Ds.
+Force True will force this value to be true in all new PsxMaterial3Ds."
 label_text = "Force Use Vertex Colors as Albedo"
 
 [node name="value" type="OptionButton" parent="ScrollContainer/list/material_force_vertex_color" unique_id=1069257946]
@@ -198,7 +187,7 @@ popup/item_2/id = 2
 
 [node name="material_force_vertex_lighting" parent="ScrollContainer/list" unique_id=1269568141 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, converted Materials will use vertex lighting. Otherwise, their shading mode will not change. (Unshaded materials are never changed.)"
+tooltip_text = "If enabled, any shaded material will become shaded using Vertex Lighting. (Unshaded materials are unaffected.)"
 label_text = "Force Vertex Lighting"
 
 [node name="value" type="CheckBox" parent="ScrollContainer/list/material_force_vertex_lighting" unique_id=2072500934]
@@ -208,7 +197,7 @@ button_pressed = true
 
 [node name="material_force_vertex_fog" parent="ScrollContainer/list" unique_id=1441808262 instance=ExtResource("1_qjfr0")]
 layout_mode = 2
-tooltip_text = "If enabled, converted Materials will use vertex fog. Otherwise, their fog mode will not change. (Materials with fog disabled are never changed.)"
+tooltip_text = "If enabled, any material with fog enabled will become fogged using Vertex Fog. (Materials with fog disabled are unaffected.)"
 label_text = "Force Vertex Fog"
 
 [node name="value" type="CheckBox" parent="ScrollContainer/list/material_force_vertex_fog" unique_id=1032359813]

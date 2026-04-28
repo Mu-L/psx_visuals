@@ -20,6 +20,11 @@ sky = SubResource("Sky_o6xl0")
 tonemap_mode = 4
 tonemap_exposure = 2.0
 tonemap_agx_white = 16.5
+fog_enabled = true
+fog_mode = 1
+fog_density = 1.0
+fog_depth_begin = 5.0
+fog_depth_end = 10.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_tefeu"]
 size = Vector2(10, 10)
@@ -77,6 +82,21 @@ script = ExtResource("11_qnkwp")
 points = PackedVector3Array(0, 0, 0, 0, 1, 0)
 color_gradient = SubResource("Gradient_choun")
 metadata/_custom_type_script = "uid://bhof12h30k66g"
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8l7eo"]
+direction = Vector3(0, 1, 0)
+initial_velocity_min = 4.0
+initial_velocity_max = 4.0
+
+[sub_resource type="GDScript" id="GDScript_8l7eo"]
+script/source = "@tool class_name PixelPointMaterial extends ShaderMaterial
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v7yua"]
+script = SubResource("GDScript_8l7eo")
+
+[sub_resource type="QuadMesh" id="QuadMesh_v7yua"]
+material = SubResource("ShaderMaterial_v7yua")
 
 [node name="Main" type="Node3D" unique_id=1699994726]
 
@@ -172,6 +192,10 @@ gravity = Vector3(0, 2, 0)
 initial_velocity_max = 10.0
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+transform_align = 1
+process_material = SubResource("ParticleProcessMaterial_8l7eo")
+draw_pass_1 = SubResource("QuadMesh_v7yua")
 
 [node name="radio2" parent="." unique_id=547690333 instance=ExtResource("12_3c5kg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20465183, 4.4808154, 3.058625)

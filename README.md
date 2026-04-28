@@ -1,7 +1,7 @@
 
 # PS1 / PSX Visuals
 
-This addon contains a set of shaders and materials you can use to make your game look like it was built on the original PlayStation hardware. Almost all of the limitations of the console have been faithfully implemented into a versatile set of shaders.
+This addon contains a set of shaders and materials you can use to make your game look like it was built on the original PlayStation 1 hardware. Almost all of the limitations of the console have been faithfully implemented into a versatile set of shaders.
 
 ## Table of Contents
 
@@ -11,13 +11,14 @@ This addon contains a set of shaders and materials you can use to make your game
 | [PsxMaterial3D](#psxmaterial3d) | The main event. How to create custom PSX materials and how to use them |
 | [Shader Globals](#shader-globals) | A list of included global shader features |
 | [Resource Conversion Tool](#conversion-tool) | How to use the conversion tool to quickly modify resources/scenes |
-| [List of Visual Features]() | |
+| [Additional Features](#additional-features) | A list of additional features and what they do |
+| [Unsupported Features](#unsupported-features) | A list of features not currently supported |
 
 ## Quickstart
 
 To install:
 
-1. Add the contents of this package to your project, into the folder `res://addons/psx`
+1. Add the contents of this package to your project, into the folder `res://addons/psx/`
 2. In project Settings, enable the associated Plugin
 3. Restart the editor
 4. Verify installation by looking for the following components
@@ -74,24 +75,34 @@ This component recreates the dizzying effect of textures warping due to a lack o
 
 This component recreates the effect of rendered colors being limited to a certain number of bits, with a dithered matrix to interpolate between them. The default value is `5` (original hardware value). `0` disables the effect.
 
-#### `psx_fog_color`
+### `psx_fog_color`
+
+This component recreates the distance fog effect used in the original [Silent Hill](https://youtu.be/6QD55_DcxrM) games. It applies a vertex-based additive emission to meshes, similar to how vertex lighting works. Using lower-poly meshes will therefore result in lower-detail fog, and high-resolution meshes will create higher-detail fog.
 
 This determines the color of the fog. The opacity of this color will determine its strength. The default value is `Color.TRANSPARENT` (no fog).
 
-#### `psx_fog_far`
+### `psx_fog_far`
 
 This value controls at which distance the fog should reach full opacity. The default value is `20.0`, but this can be set to anything without compromising PSX authenticity.
 
-#### `psx_fog_near`
+### `psx_fog_near`
 
 This value controls at which distance the fog should reach full transparency. The default value is `10.0`, but this can be set to anything without compromising PSX authenticity.
 
 > [!TIP]
-> For more information about other implementations of PSX fog or how to implement them, see [this video by Elias Daler](https://www.youtube.com/watch?v=EwpFdMJlVP4).
+> There are other methods of creating fog for PSX-style games, that are not implemented in this addon. For more information about other implementations of PSX fog or how to recreate them, see [this video by Elias Daler](https://www.youtube.com/watch?v=EwpFdMJlVP4).
 
-### Vertex Snapping (Jitter)
+### `psx_precision_uv`
 
-This component recreates the effect of vertices being limited to integer screen pixels. It is controlled by the `psx_snap_distance` shader global. The default value is `1.0`. Higher values will increase the effect. `0.0` will disable the effect.
+This value effectively sets a hard limit on texture resolution by truncating UV coordinates.
+
+### `psx_precision_xy`
+
+This component recreates the effect of vertices being limited to integer screen pixels. AKA "vertex jitter." It controls how many possible X and Y positions (screen space) are available for vertices to use. Vertex positions are truncated. Smaller values will increase the strength of the effect.
+
+### `psx_precision_z`
+
+This component is used in tandem with [psx_precision_xy](#psx_precision_xy). It controls how many possible depth values are available for vertices to use. Smaller values will increase the strength of the effect.
 
 ## Conversion Tool
 
@@ -100,25 +111,47 @@ In a PSX-style game, you will want to use a PSX material on almost all `MeshInst
 > [!CAUTION]
 > Using the conversion Wizard is currently irreversible. Make a backup or VCS commit of your project before using.
 
+### Converting Resources
+
+This is the most straightforward way of using the conversion tool.
+
+1. Select desired resources in the FileSystem
+2. Right-click to open the context menu
+3. Select `Convert Selected Resource(s) to PSX...`
+4. Choose [options](#conversion-options) and click `Convert`
+
+### Converting Native Scenes
+
 Each Node now has a new field called "PSX Ignore" in `Node > Editor Description`. Use this to change which Nodes are processed. Beware! If you convert a resource that a Node uses, it will be affected whether or not it is ignored.
 
-# Visual Features Reference
+### Conversion Options
 
-## Affine Texture Warping
+| **Conversion Selections** | |
+|-|-|
+| Native Scenes | If this is set, native scenes (`.tscn`, etc.) will be eligible for conversion. This will iterate through each node in the scene and modify various `GeometryInstance3D` nodes.<li>`Ignore` will omit the resource from being converted.</li><li>`Overwrite` will overwrite existing file paths</li><li>`Create New` will create a new file path alongside the old one.</li>
+| Imported Scenes | If this is set, imported scenes (`.gltf`, `.glb`, `.blend`, etc.) will be eligible for conversion. This will create new Materials for each material slot name in the scene and assign the scene to use an External material. |
+| Meshes | If this is set, Mesh resources will be eligible for conversion. This will convert materials in each non-null surface material slot. |
+| BaseMaterial3Ds | If this is set, BaseMaterial3D resources will be eligible for conversion. This will create a new `PsxMaterial3D` based on the properties of the BaseMaterial3D.
+| ShaderMaterials | If this is set, ShaderMaterial resources will be eligible for conversion. This will attempt to transfer similarly-named properties on the ShaderMaterial to a newly created `PsxMaterial3D`. |
+| Object Properties | If enabled, this will iterate through all object properties of every Resource and Node touched, and attempt to convert any Materials found in them. |
 
-## Bit Depth Reduction
+| **Material Settings** | |
+|-|-|
+| Force Use Vertex Colors as Albedo | This setting affects [Gouraud Shading](https://en.wikipedia.org/wiki/Gouraud_shading) in `PsxMaterial3D`s.<li>`Ignore` will not change this value in any new materials.<li>`Force False` will force this value to be `false` in all new `PsxMaterial3D`s.<li>`Force True` will force this value to be `true ` in all new `PsxMaterial3D`s.
+| Force Vertex Lighting | If enabled, any shaded material will become shaded using Vertex Lighting. (Unshaded materials are unaffected.)  |
+| Force Vertex Fog | If enabled, any material with fog enabled will become fogged using Vertex Fog. (Materials with fog disabled are unaffected.)
 
-## Vertex Jitter
+# Additional Features
 
+## LineMesh
 
+This is a quick mesh that constructs a line from an array of `points`. You can use `gradient` to assign vertex colors.
 
-## Fog
-
-This component recreates the distance fog effect used in the original [Silent Hill](https://youtu.be/6QD55_DcxrM) games. It applies a vertex-based additive emission to meshes, similar to how vertex lighting works. Using lower-poly meshes will therefore result in lower-detail fog, and high-resolution meshes will create higher-detail fog.  It is controlled by three values:
-
+## PsxEnvironment
 
 # Unsupported Features
 
 This is a list of features that are not yet supported. Links to associated [GitHub issues](https://github.com/snotbane/psx_visuals/issues) are attached.
 
 - [Painter's Algorithm / Z-Buffer Errors](https://github.com/snotbane/psx_visuals/issues/12)
+- [1-to-1 Pixel Perfect Particles](https://github.com/snotbane/psx_visuals/issues/13)

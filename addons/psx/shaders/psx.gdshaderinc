@@ -100,7 +100,8 @@ void vertex() {
 	float precision_xy = psx_precision_xy * i_precision_xy;
 	float precision_z = psx_precision_z * i_precision_z;
 
-	v_clip = PROJECTION_MATRIX * MODELVIEW_MATRIX * vec4(VERTEX, 1.0);
+	mat4 CLIP_MATRIX = PROJECTION_MATRIX * MODELVIEW_MATRIX;
+	v_clip = CLIP_MATRIX * vec4(VERTEX, 1.0);
 	//v_clip.xyz /= v_clip.w;
 	v_clip.xy *= viewport_ratio;
 	if (precision_xy != 0.0) {
@@ -111,7 +112,7 @@ void vertex() {
 	}
 	v_clip.xy /= viewport_ratio;
 	//v_clip.xyz *= v_clip.w;
-	VERTEX = (inverse(PROJECTION_MATRIX * MODELVIEW_MATRIX) * v_clip).xyz;
+	VERTEX = (inverse(CLIP_MATRIX) * v_clip).xyz;
 
 	v_uv = UV * v_clip.w;
 	v_uv2 = UV2 * v_clip.w;

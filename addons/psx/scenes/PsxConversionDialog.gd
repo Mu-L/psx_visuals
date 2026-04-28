@@ -230,8 +230,7 @@ func convert_tree(node: Node, root: Node = node) -> void:
 
 func convert_node(node: Node) -> void:
 	if node is MeshInstance3D:
-		if options.get(&"deep", false):
-			node.mesh = convert_resource(node.mesh)
+		node.mesh = convert_resource(node.mesh)
 
 		for idx in node.get_surface_override_material_count():
 			node.set_surface_override_material(idx, convert_resource(node.get_surface_override_material(idx)))

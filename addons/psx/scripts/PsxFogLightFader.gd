@@ -1,8 +1,8 @@
 ## Add this to a [Light3D] to automatically handle it fading in and out with fog.
 class_name PsxFogLightFader extends Node
 
-## If enabled, this will dim the light instead of using the traditional distance fade. Updates every frame.
-@export var dim_only: bool = false
+## The opacity of fog that must be present in order to enable distance fade culling. 0.0 will always enable (most efficient, but lights will disappear in semi-transparent fog); 1.0 will only enable if the fog is completely opaque (most accurate).
+@export var distance_fade_threshold: float = 0.0
 
 
 @onready var light: Light3D = get_parent()
@@ -30,10 +30,9 @@ func _process(delta: float) -> void:
 	), 0.0, 1.0)
 
 func refresh() -> void:
-	if dim_only:
-		light.distance_fade_enabled = false
-	else:
+	light.distance_fade_enabled = Psx.fog_color.a >= distance_fade_threshold
+	light.distance_fade_begin = minf(Psx.fog_near, Psx.fog_far)
+	light.distance_fade_length = absf(Psx.fog_far - light.distance_fade_begin)
+
+	if light.distance_fade_enabled:
 		light.light_energy = light_energy
-		light.distance_fade_enabled = Psx.fog_color.a >= 1.0
-		light.distance_fade_begin = minf(Psx.fog_near, Psx.fog_far)
-		light.distance_fade_length = absf(Psx.fog_far - light.distance_fade_begin)

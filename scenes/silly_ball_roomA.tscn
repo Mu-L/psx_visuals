@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dg02dtuy2gt83"]
 
-[ext_resource type="Script" uid="uid://cwo3ld44ocipw" path="res://addons/psx/scripts/PsxEnvironment.gd" id="1_bbydb"]
+[ext_resource type="Script" uid="uid://cwo3ld44ocipw" path="res://addons/psx/scripts/PsxWorldEnvironment.gd" id="1_bbydb"]
 [ext_resource type="Material" uid="uid://bpp50d5phh2m0" path="res://test/scaryman_psx.tres" id="1_ow7br"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="2_k2hjv"]
 [ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="3_inbau"]
@@ -225,7 +225,6 @@ distance_fade_length = 8.0
 
 [node name="PsxFogLightFader" type="Node" parent="OmniLight3D" unique_id=1692840559]
 script = ExtResource("8_le4ex")
-dim_only = true
 metadata/_custom_type_script = "uid://b7tof7505prr2"
 
 [node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1564800933]

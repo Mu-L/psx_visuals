@@ -147,7 +147,22 @@ Each Node now has a new field called "PSX Ignore" in `Node > Editor Description`
 
 This is a quick mesh that constructs a line from an array of `points`. You can use `gradient` to assign vertex colors.
 
-## PsxEnvironment
+## PsxWorldEnvironment
+
+This is a variant of `WorldEnvironment` that updates PSX fog according to `environment`. The fog mode must be set to `Depth`.
+
+`fog_light_color` and `fog_light_density` together will affect `psx_fog_color`.
+
+`fog_depth_begin` and `fog_depth_end` will affect `psx_fog_near` and `psx_fog_far`, respectively.
+
+Other properties are ignored.
+
+## PsxFogLightFader
+
+This is a `Node` that can be added to an existing `Light3D`. It will update the light's distance fade properties and `light_energy`. Use this on every light in any PSX scene with vertex fog.
+
+> [!NOTE]
+> This `Node` is only active during runtime. Lights may display incorrectly in the editor.
 
 # Unsupported Features
 

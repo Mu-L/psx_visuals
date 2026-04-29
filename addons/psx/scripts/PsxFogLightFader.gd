@@ -17,6 +17,12 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 func _ready() -> void:
+	if Psx.inst == null:
+		var process_mode_prev := process_mode
+		process_mode = Node.PROCESS_MODE_DISABLED
+		await Psx.await_inst(self )
+		process_mode = process_mode_prev
+
 	Psx.inst.fog_changed.connect(refresh)
 	refresh()
 
@@ -28,6 +34,7 @@ func _process(delta: float) -> void:
 		get_viewport().get_camera_3d().global_position.distance_to(light.global_position),
 		Psx.fog_near, Psx.fog_far, 1.0, 1.0 - Psx.fog_color.a
 	), 0.0, 1.0)
+
 
 func refresh() -> void:
 	light.distance_fade_enabled = Psx.fog_color.a >= distance_fade_threshold

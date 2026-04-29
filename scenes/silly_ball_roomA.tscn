@@ -31,8 +31,8 @@ tonemap_agx_white = 16.5
 fog_enabled = true
 fog_mode = 1
 fog_density = 1.0
-fog_depth_begin = 5.0
-fog_depth_end = 10.0
+fog_depth_begin = 16.0
+fog_depth_end = 30.0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_7ijgt"]
 size = Vector2(10, 10)

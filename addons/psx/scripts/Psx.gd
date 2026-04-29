@@ -180,42 +180,50 @@ const GLOBAL_VARS := {
 }
 
 static var affine_strength: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_affine_strength")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_affine_strength", value)
+	set(value):
+		affine_strength = value
+		RenderingServer.global_shader_parameter_set(&"psx_affine_strength", value)
 
 static var bit_depth: int:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_bit_depth")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_bit_depth", value)
+	set(value):
+		bit_depth = value
+		RenderingServer.global_shader_parameter_set(&"psx_bit_depth", value)
 
 static var fog_color: Color:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_color")
 	set(value):
+		fog_color = value
 		RenderingServer.global_shader_parameter_set(&"psx_fog_color", value)
+		if inst == null: return
 		inst.fog_changed.emit()
 
 static var fog_far: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_far")
 	set(value):
+		fog_far = value
 		RenderingServer.global_shader_parameter_set(&"psx_fog_far", value)
+		if inst == null: return
 		inst.fog_changed.emit()
 
 static var fog_near: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_near")
 	set(value):
+		fog_near = value
 		RenderingServer.global_shader_parameter_set(&"psx_fog_near", value)
+		if inst == null: return
 		inst.fog_changed.emit()
 
 static var precision_uv: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_uv")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_precision_uv", value)
+	set(value):
+		precision_uv = value
+		RenderingServer.global_shader_parameter_set(&"psx_precision_uv", value)
 
 static var precision_xy: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_xy")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_precision_xy", value)
+	set(value):
+		precision_xy = value
+		RenderingServer.global_shader_parameter_set(&"psx_precision_xy", value)
 
 static var precision_z: float:
-	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_z")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_precision_z", value)
+	set(value):
+		precision_z = value
+		RenderingServer.global_shader_parameter_set(&"psx_precision_z", value)
 
 
 static func touch_shader_globals() -> void:
@@ -227,6 +235,8 @@ static func touch_shader_globals() -> void:
 			data.erase(&"rtype")
 			ProjectSettings.set_setting(setting, data)
 			ProjectSettings.set_initial_value(setting, data[&"value"])
+		if not Engine.is_editor_hint():
+			inst.set(k, RenderingServer.global_shader_parameter_get(k))
 
 	ProjectSettings.save()
 
@@ -288,6 +298,11 @@ static func get_resources(paths: Array, type: String, result: Array = []) -> Arr
 	return result
 
 
+static func await_inst(node: Node):
+	while inst == null:
+		await node.get_tree().create_timer(1.0).timeout
+
+
 signal fog_changed
 
 
@@ -296,6 +311,10 @@ var scene_tree_context_menu_plugin: PsxSceneTreeContextMenuPlugin
 var inspector_plugin: PsxInspectorPlugin
 var post_process_node: Node
 var converter: PsxConversionDialog
+
+
+func _init() -> void:
+	inst = self
 
 
 func _enable_plugin() -> void:
@@ -307,8 +326,6 @@ func _disable_plugin() -> void:
 
 
 func _enter_tree() -> void:
-	inst = self
-
 	touch_shader_globals()
 
 	var command_palette := get_editor_interface().get_command_palette()

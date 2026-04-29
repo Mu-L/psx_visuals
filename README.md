@@ -147,6 +147,10 @@ Each Node now has a new field called "PSX Ignore" in `Node > Editor Description`
 
 This is a quick mesh that constructs a line from an array of `points`. You can use `gradient` to assign vertex colors.
 
+## RayShadowCaster
+
+This is a simple `Raycast3D` Node that creates a simple shadow sprite underneath its parent.
+
 ## PsxWorldEnvironment
 
 This is a variant of `WorldEnvironment` that updates PSX fog according to `environment`. The fog mode must be set to `Depth`.

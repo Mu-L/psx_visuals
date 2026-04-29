@@ -306,7 +306,7 @@ func convert_material_from(material: Material) -> PsxMaterial3D:
 		)
 
 		result.fog_mode = (
-			BaseMaterial3D.SHADING_MODE_PER_VERTEX
+			PsxMaterial3D.FogMode.PER_VERTEX
 			if options.get(&"material_force_vertex_fog", true) and not material.disable_fog
 			else int(not material.disable_fog)
 		)

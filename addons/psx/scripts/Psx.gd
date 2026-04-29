@@ -189,15 +189,21 @@ static var bit_depth: int:
 
 static var fog_color: Color:
 	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_color")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_color", value)
+	set(value):
+		RenderingServer.global_shader_parameter_set(&"psx_fog_color", value)
+		inst.fog_changed.emit()
 
 static var fog_far: float:
 	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_far")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_far", value)
+	set(value):
+		RenderingServer.global_shader_parameter_set(&"psx_fog_far", value)
+		inst.fog_changed.emit()
 
 static var fog_near: float:
 	get: return RenderingServer.global_shader_parameter_get(&"psx_fog_near")
-	set(value): RenderingServer.global_shader_parameter_set(&"psx_fog_near", value)
+	set(value):
+		RenderingServer.global_shader_parameter_set(&"psx_fog_near", value)
+		inst.fog_changed.emit()
 
 static var precision_uv: float:
 	get: return RenderingServer.global_shader_parameter_get(&"psx_precision_uv")
@@ -247,6 +253,9 @@ static var MAT_PLACEHOLDER: PsxMaterial3D:
 	get: return load("res://addons/psx/materials/psx_mat_placeholder.tres")
 
 
+static var inst: Psx
+
+
 static func get_path_file_name(path: String) -> String:
 	return path.right(path.rfind("/")).left(path.rfind("."))
 
@@ -279,6 +288,9 @@ static func get_resources(paths: Array, type: String, result: Array = []) -> Arr
 	return result
 
 
+signal fog_changed
+
+
 var file_system_context_menu_plugin: PsxFileSystemContextMenuPlugin
 var scene_tree_context_menu_plugin: PsxSceneTreeContextMenuPlugin
 var inspector_plugin: PsxInspectorPlugin
@@ -295,6 +307,8 @@ func _disable_plugin() -> void:
 
 
 func _enter_tree() -> void:
+	inst = self
+
 	touch_shader_globals()
 
 	var command_palette := get_editor_interface().get_command_palette()

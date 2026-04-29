@@ -46,7 +46,7 @@ varying vec3 v_fog_color;
 
 void vertex() {
     v_vertex_color = COLOR.rgb;
-	
+
 #if !defined BILLBOARD_DISABLED
 #if defined BILLBOARD_KEEP_SCALE
 	mat3 model_basis = mat3(MODEL_MATRIX[0].xyz, MODEL_MATRIX[1].xyz, MODEL_MATRIX[2].xyz);
@@ -76,7 +76,7 @@ void vertex() {
 #elif defined BILLBOARD_FIXED_Y
 	vec3 vr = vec3(1.0, 0.0, 0.0);
 	vec3 vu = VIEW_MATRIX[1].xyz;
-	
+
 	MODELVIEW_MATRIX = mat4(
 		vec4(vr, 0.0),
 		vec4(vu, 0.0),
@@ -161,7 +161,6 @@ void fragment() {
 #if defined VERTEX_FOG_ENABLED
 	NORMAL = mix(NORMAL, vec3(0.0, 0.0, -1.0), v_fog_strength);
 	ALBEDO = mix(albedo.rgb, v_fog_color, v_fog_strength);
-	//ALBEDO = albedo.rgb * (1.0 - v_fog_strength) + v_fog_color;
 	EMISSION += v_fog_color * v_fog_strength;
 #elif defined VERTEX_FOG_ALWAYS
 	NORMAL = vec3(0.0, 0.0, -1.0);

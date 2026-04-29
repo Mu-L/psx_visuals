@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://n5lg8ffunm8k"]
 
-[ext_resource type="Material" uid="uid://do05cdjiu5ax3" path="res://test/scaryman.tres" id="1_8l7eo"]
 [ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="3_s7nt7"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="4_pxfo5"]
 [ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="11_qnkwp"]
@@ -114,7 +113,6 @@ environment = SubResource("Environment_tipki")
 [node name="MeshInstance3D5" type="MeshInstance3D" parent="RigidBody3D4" unique_id=849679747]
 transform = Transform3D(1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0)
 mesh = SubResource("PlaneMesh_tefeu")
-surface_material_override/0 = ExtResource("1_8l7eo")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4" unique_id=1956428608]
 shape = SubResource("WorldBoundaryShape3D_tefeu")
@@ -137,7 +135,6 @@ material = SubResource("StandardMaterial3D_aa1un")
 
 [node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
-material = ExtResource("1_8l7eo")
 precision_uv = 0.5
 precision_xy = 0.5
 precision_z = 0.5
@@ -152,7 +149,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
 
 [node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
-material = ExtResource("1_8l7eo")
 
 [node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("4_pxfo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
@@ -175,7 +171,6 @@ transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.58500
 [node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
 transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, -0.9999995, 0)
 mesh = SubResource("SphereMesh_choun")
-surface_material_override/0 = ExtResource("1_8l7eo")
 
 [node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=1765450839]
 material_override = SubResource("StandardMaterial3D_yf6l0")

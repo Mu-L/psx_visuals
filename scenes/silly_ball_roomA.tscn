@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://dg02dtuy2gt83"]
 
 [ext_resource type="Script" uid="uid://cwo3ld44ocipw" path="res://addons/psx/scripts/PsxWorldEnvironment.gd" id="1_bbydb"]
-[ext_resource type="Material" uid="uid://bpp50d5phh2m0" path="res://test/scaryman_psx.tres" id="1_ow7br"]
 [ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="2_k2hjv"]
 [ext_resource type="Texture2D" uid="uid://t6c0bgmve63x" path="res://addons/psx/textures/shadow_32x32.png" id="3_inbau"]
+[ext_resource type="Shader" uid="uid://85o1o8fu8ln2" path="res://addons/psx/shaders/cache/psx_01722.gdshader" id="4_bbydb"]
 [ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="4_g6y8m"]
 [ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="4_le4ex"]
 [ext_resource type="Shader" uid="uid://b80w2cea6rxfg" path="res://addons/psx/shaders/cache/psx_04746.gdshader" id="5_bbydb"]
@@ -37,6 +37,16 @@ fog_depth_end = 30.0
 size = Vector2(10, 10)
 subdivide_width = 3
 subdivide_depth = 3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ke4r6"]
+render_priority = 0
+shader = ExtResource("4_bbydb")
+shader_parameter/u_vertex_color_use_as_albedo = true
+shader_parameter/u_albedo_texture = ExtResource("8_rm2wt")
+shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
+script = ExtResource("4_le4ex")
+cull_mode = 2
+albedo_texture = ExtResource("8_rm2wt")
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
 
@@ -164,7 +174,7 @@ script = ExtResource("1_bbydb")
 [node name="MeshInstance3D5" type="MeshInstance3D" parent="RigidBody3D4" unique_id=849679747]
 transform = Transform3D(1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0)
 mesh = SubResource("PlaneMesh_7ijgt")
-surface_material_override/0 = ExtResource("1_ow7br")
+surface_material_override/0 = SubResource("ShaderMaterial_ke4r6")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4" unique_id=1956428608]
 shape = SubResource("WorldBoundaryShape3D_tefeu")
@@ -187,7 +197,7 @@ material = SubResource("ShaderMaterial_ro3dj")
 
 [node name="silly_ball5" parent="." unique_id=1740439713 instance=ExtResource("2_k2hjv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
-material = ExtResource("1_ow7br")
+material = SubResource("ShaderMaterial_ke4r6")
 precision_uv = 0.5
 precision_xy = 0.5
 precision_z = 0.5
@@ -202,7 +212,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
 
 [node name="silly_ball8" parent="." unique_id=1221909979 instance=ExtResource("2_k2hjv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
-material = ExtResource("1_ow7br")
+material = SubResource("ShaderMaterial_ke4r6")
 
 [node name="silly_ball9" parent="." unique_id=1327442188 instance=ExtResource("2_k2hjv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)

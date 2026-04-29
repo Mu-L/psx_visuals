@@ -11,7 +11,7 @@ class PsxFileSystemContextMenuPlugin extends EditorContextMenuPlugin:
 
 
 	func _popup_menu(paths: PackedStringArray) -> void:
-		add_context_menu_item("Convert Selected Resource(s) to PSX...", plugin.CONTEXT_convert_selected_paths)
+		add_context_menu_item("Convert Resource(s) to PSX...", plugin.CONTEXT_convert_selected_paths)
 
 
 class PsxSceneTreeContextMenuPlugin extends EditorContextMenuPlugin:
@@ -63,27 +63,6 @@ class PsxInspectorPlugin extends EditorInspectorPlugin:
 			ignore_option.select(object.get_meta(META_IGNORE))
 		ignore_container.add_child(ignore_option)
 
-
-		## This is dumb. If you're going to add this option, why not just set the material directly in the Node itself?
-
-		# var auto_container := HBoxContainer.new()
-		# auto_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		# container.add_child(auto_container)
-
-		# var auto_label := Label.new()
-		# auto_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		# auto_label.text = "PSX Auto Apply"
-		# auto_label.tooltip_text = "Adds an editor-only meta value '%s' (Material).\nThis Material will be applied" % META_MATERIAL
-		# auto_container.add_child(auto_label)
-
-		# var auto_option := EditorResourcePicker.new()
-		# auto_option.base_type = "Material"
-		# auto_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		# auto_option.resource_changed.connect(_auto_resource_changed.bind(object))
-		# if object.has_meta(META_MATERIAL):
-		# 	auto_option.edited_resource = object.get_meta(META_MATERIAL)
-		# auto_container.add_child(auto_option)
-
 		add_custom_control(container)
 
 
@@ -101,6 +80,17 @@ class PsxInspectorPlugin extends EditorInspectorPlugin:
 
 
 #region Commands
+
+const CONVERT_CURRENT_SCENE_NAME := "Convert Current Scene to PSX..."
+const CONVERT_CURRENT_SCENE_KEY := "psx/convert_current_scene"
+const CONVERT_SELECTED_NODE_NAME := "Convert Selected Node(s) to PSX..."
+const CONVERT_SELECTED_NODE_KEY := "psx/convert_selected_node"
+const CONVERT_ENTIRE_PROJECT_NAME := "Convert Entire Project to PSX..."
+const CONVERT_ENTIRE_PROJECT_KEY := "psx/convert_entire_project"
+const REBUILD_SHADERS_NAME := "Rebuild Shaders"
+const REBUILD_SHADERS_KEY := "psx/rebuild_shaders"
+const PURGE_SHADERS_NAME := "Purge Unused Shaders"
+const PURGE_SHADERS_KEY := "psx/purge_unused_shaders"
 
 func COMMAND_convert_entire_project() -> void:
 	if not await converter.prompt(): return
@@ -244,16 +234,6 @@ static func touch_shader_globals() -> void:
 
 const AUTOLOAD_NAME := "psx_post_process"
 const AUTOLOAD_PATH := "res://addons/psx/scripts/PsxPostProcessAutoload.gd"
-const CONVERT_CURRENT_SCENE_NAME := "Convert Current Scene to PSX..."
-const CONVERT_CURRENT_SCENE_KEY := "psx/convert_current_scene"
-const CONVERT_SELECTED_NODE_NAME := "Convert Selected Node(s) to PSX..."
-const CONVERT_SELECTED_NODE_KEY := "psx/convert_selected_node"
-const CONVERT_ENTIRE_PROJECT_NAME := "Convert Entire Project to PSX..."
-const CONVERT_ENTIRE_PROJECT_KEY := "psx/convert_entire_project"
-const PURGE_SHADERS_NAME := "Purge Unused Shaders"
-const PURGE_SHADERS_KEY := "psx/purge_unused_shaders"
-const REBUILD_SHADERS_NAME := "Rebuild Unused Shaders"
-const REBUILD_SHADERS_KEY := "psx/rebuild_unused_shaders"
 
 static var CONVERTER_SCENE: PackedScene:
 	get: return load("res://addons/psx/scenes/PsxConversionDialog.tscn")
@@ -332,8 +312,8 @@ func _enter_tree() -> void:
 	command_palette.add_command(CONVERT_CURRENT_SCENE_NAME, CONVERT_CURRENT_SCENE_KEY, COMMAND_convert_current_scene)
 	command_palette.add_command(CONVERT_SELECTED_NODE_NAME, CONVERT_SELECTED_NODE_KEY, COMMAND_convert_selected_nodes)
 	command_palette.add_command(CONVERT_ENTIRE_PROJECT_NAME, CONVERT_ENTIRE_PROJECT_KEY, COMMAND_convert_entire_project)
-	command_palette.add_command(PURGE_SHADERS_NAME, PURGE_SHADERS_KEY, PsxMaterial3D.purge_unused_shaders)
 	command_palette.add_command(REBUILD_SHADERS_NAME, REBUILD_SHADERS_KEY, PsxMaterial3D.rebuild_shaders)
+	# command_palette.add_command(PURGE_SHADERS_NAME, PURGE_SHADERS_KEY, PsxMaterial3D.purge_unused_shaders)
 
 	if file_system_context_menu_plugin == null:
 		file_system_context_menu_plugin = PsxFileSystemContextMenuPlugin.new(self )
@@ -362,8 +342,8 @@ func _exit_tree() -> void:
 	command_palette.remove_command(CONVERT_CURRENT_SCENE_KEY)
 	command_palette.remove_command(CONVERT_SELECTED_NODE_KEY)
 	command_palette.remove_command(CONVERT_ENTIRE_PROJECT_KEY)
-	command_palette.remove_command(PURGE_SHADERS_KEY)
 	command_palette.remove_command(REBUILD_SHADERS_KEY)
+	# command_palette.remove_command(PURGE_SHADERS_KEY)
 
 	if file_system_context_menu_plugin != null:
 		remove_context_menu_plugin(file_system_context_menu_plugin)

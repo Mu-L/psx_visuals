@@ -24,8 +24,8 @@ To install:
 4. Verify installation by looking for the following components
 	- Autoload Node called `psx_post_process`
 	- [New Shader Globals](#shader-globals)
-	- [New context menu options]() in the FileSystem and SceneTree
-	- [New commands]() in the command palette
+	- [New context menu options](#context-menu-additions) in the FileSystem and SceneTree
+	- [New commands](#command-palette-additions) in the command palette
 	- A newly created folder `res://addons/psx/shaders/cache` with some shader files inside
 
 ## `PsxMaterial3D`
@@ -36,20 +36,23 @@ To install:
 
 The following is an explanation of properties in `PsxMaterial3D` that differ from `StandardMaterial3D`.
 
-- `fog_mode`: There are now 3 options for fog.
+- `fog_mode`: There are now 4 options for fog.
 	- Disabled ( `render_mode fog_disabled` )
 	- Per-Pixel ( unchanged, use regular distance fog )
-	- Per-Vertex. This is the standard for PSX distance fog.
+	- Per-Vertex: This is the standard for PSX distance fog.
+	- Always: This forces the entire material to use maximum vertex fog. Use this for skyboxes.
 
 - Instance shader parameters `i_precision_uv`, `i_precision_xy`, and `i_precision_z`. These act as scalars for their shader global counterparts.
 
 > [!TIP]
-> Due to the way that PsxMaterial3D is implemented, a new shader may need to be created each time certain parameters are set. These shaders are stored in `res://addons/psx/shaders/cache`. The system will automatically handle these shaders, but they must be manually removed when no longer in use. It is recommended you do the following before exporting your project:
+> Due to the way that PsxMaterial3D is implemented, a new shader may need to be created each time certain parameters are set. These shaders are stored in `res://addons/psx/shaders/cache`. The system will automatically handle these shaders, but they must be manually removed when no longer in use.
+<!-- Omitting this for now because this operation is not safe. -->
+<!--
+> It is recommended you do the following before exporting your project:
 > 1. Close all open Scenes
 > 2. Restart the editor
 > 3. Open the command palette and run `Psx > Purge Unused Shaders`.
->
-> This operation is very safe and will never delete any used shaders. Alternatively, you can delete the cache folder entirely, but this is a more nuclear option and may result in loss of data.
+-->
 
 ## Shader Globals
 
@@ -64,12 +67,12 @@ This is a list of all global shader properties (modified in `Project Settings > 
 - [`psx_precision_xy`](#vertex-precision-xy)
 - [`psx_precision_z`](#vertex-precision-z)
 
-> [!TIP]
-> Any or all of these properties can be converted to instance shader parameters if desired. Feel free to modify to your liking. For the sake of simplicity, they have been set to global parameters.
-
 ### `psx_affine_strength`
 
-This component recreates the dizzying effect of textures warping due to a lack of a depth buffer. The default value is `1.0`. `0.0` will disable the effect. It is generally not recommended to use values outside the `0...1` range.
+This component recreates the dizzying effect of textures warping due to a lack of proper depth information. The default value is `1.0`. `0.0` will disable the effect. It is generally not recommended to use values outside the `0...1` range.
+
+> [!TIP]
+> If you're experiencing excessive warping, you may need to add more subdivision polygons to your mesh.
 
 ### `psx_bit_depth`
 
@@ -143,13 +146,30 @@ Each Node now has a new field called "PSX Ignore" in `Node > Editor Description`
 
 # Additional Features
 
+## Context Menu Additions
+
+| | |
+|-|-|
+| Convert Resource(s) to PSX | Converts resources currently selected in the FileSystem to PSX. |
+| Convert Node(s) to PSX | Converts Nodes currently selected in the currently open Scene to PSX. |
+
+## Command Palette Additions
+
+| | |
+|-|-|
+| Convert Current Scene to PSX | Converts the currently open scene to PSX. |
+| Convert Selected Node(s) to PSX | Converts selected Nodes in the SceneTree of the currently open scene to PSX. |
+| Convert Entire Project to PSX | Converts all resources in the FileSystem to PSX. |
+| Rebuild Shaders | Rebuilds shaders. No need to run this unless PsxMaterial3D shader options were changed. |
+<!-- | Purge Unsused Shaders | Removes unused shaders from the cache. | -->
+
 ## LineMesh
 
 This is a quick mesh that constructs a line from an array of `points`. You can use `gradient` to assign vertex colors.
 
 ## RayShadowCaster
 
-This is a simple `Raycast3D` Node that creates a simple shadow sprite underneath its parent.
+This is a simple `Raycast3D` Node that creates a simple shadow sprite at the collision point.
 
 ## PsxWorldEnvironment
 

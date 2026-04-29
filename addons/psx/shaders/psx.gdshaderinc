@@ -119,11 +119,12 @@ void vertex() {
 
 #if defined VERTEX_FOG_ENABLED
 	v_fog_strength = psx_fog_near != psx_fog_far ?
-		clamp((v_clip.w - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
+		psx_fog_color.a * clamp((v_clip.w - psx_fog_near) / (psx_fog_far - psx_fog_near), 0.0, 1.0) :
 		0.0;
-	v_fog_color = psx_fog_color.rgb * psx_fog_color.a;
+	v_fog_color = psx_fog_color.rgb;
 #elif defined VERTEX_FOG_ALWAYS
-	v_fog_color = psx_fog_color.rgb * psx_fog_color.a;
+	v_fog_strength = psx_fog_color.a;
+	v_fog_color = psx_fog_color.rgb;
 #endif
 }
 
@@ -158,7 +159,7 @@ void fragment() {
 	EMISSION = emission * u_emission_energy_multiplier;
 #endif
 
-#if defined VERTEX_FOG_ENABLED
+#if (defined VERTEX_FOG_ENABLED) || (defined VERTEX_FOG_ALWAYS)
 	NORMAL = mix(NORMAL, vec3(0.0, 0.0, -1.0), v_fog_strength);
 	ALBEDO = mix(albedo.rgb, v_fog_color, v_fog_strength);
 	EMISSION += v_fog_color * v_fog_strength;

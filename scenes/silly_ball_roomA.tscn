@@ -30,7 +30,6 @@ tonemap_exposure = 2.0
 tonemap_agx_white = 16.5
 fog_enabled = true
 fog_mode = 1
-fog_density = 1.0
 fog_depth_begin = 16.0
 fog_depth_end = 30.0
 
@@ -233,6 +232,7 @@ visible = false
 
 [node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
 transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 9, 95, -57)
+visible = false
 mesh = SubResource("SphereMesh_0bu2u")
 surface_material_override/0 = SubResource("ShaderMaterial_snqw0")
 

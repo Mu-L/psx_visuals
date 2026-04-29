@@ -31,14 +31,17 @@ func _init() -> void:
 	mesh.material_override = _material_override
 	add_child(mesh, false, INTERNAL_MODE_BACK)
 
+	top_level = true
+
 
 func _process(delta: float) -> void:
 	global_rotation = Vector3.ZERO
+	global_position = get_parent().global_position
 
 	mesh.visible = is_colliding()
 	if not mesh.visible: return
 
-	var collision_percent: float = global_position.distance_squared_to(get_collision_point()) / target_position.length_squared()
+	var collision_percent: float = global_position.distance_to(get_collision_point()) / target_position.length()
 
 	mesh.global_position = get_collision_point() + get_collision_normal() * margin
 	mesh.global_basis.z = - get_collision_normal()

@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://bia7fv3gpsaos"]
+
+[ext_resource type="Script" uid="uid://cwo3ld44ocipw" path="res://addons/psx/scripts/PsxWorldEnvironment.gd" id="1_wfqjd"]
+[ext_resource type="Material" uid="uid://bpp50d5phh2m0" path="res://test/scaryman_psx.tres" id="2_nlitt"]
+[ext_resource type="PackedScene" uid="uid://cxvwilg7m23wl" path="res://scenes/silly_ball.tscn" id="3_5jxxg"]
+[ext_resource type="Script" uid="uid://cb12verrfoj5k" path="res://addons/psx/scripts/PsxMaterial3D.gd" id="5_bhsyx"]
+[ext_resource type="Shader" uid="uid://bb7ox3cjecbjl" path="res://addons/psx/shaders/cache/psx_00210.gdshader" id="7_svqmj"]
+[ext_resource type="Script" uid="uid://b7tof7505prr2" path="res://addons/psx/scripts/PsxFogLightFader.gd" id="9_c2t01"]
+[ext_resource type="Texture2D" uid="uid://blpwynvjwergx" path="res://icon.png" id="10_kho4m"]
+[ext_resource type="Shader" uid="uid://8soxhoiouhhv" path="res://addons/psx/shaders/cache/psx_01743.gdshader" id="11_fvnj1"]
+[ext_resource type="Script" uid="uid://bhof12h30k66g" path="res://addons/psx/scripts/LineMesh.gd" id="12_0u04s"]
+[ext_resource type="PackedScene" uid="uid://b3wh28wasout3" path="res://test/Assets/gltf/radio2.gltf" id="13_5k30f"]
+[ext_resource type="PackedScene" uid="uid://wjjffpu6jqe8" path="res://test/Assets/gltf/radio.gltf" id="14_8p84c"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tefeu"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_o6xl0"]
+sky_material = SubResource("ProceduralSkyMaterial_tefeu")
+
+[sub_resource type="Environment" id="Environment_tipki"]
+background_mode = 2
+sky = SubResource("Sky_o6xl0")
+tonemap_mode = 4
+tonemap_exposure = 2.0
+tonemap_agx_white = 16.5
+fog_enabled = true
+fog_mode = 1
+fog_density = 1.0
+fog_depth_begin = 16.0
+fog_depth_end = 30.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7ijgt"]
+size = Vector2(10, 10)
+subdivide_width = 3
+subdivide_depth = 3
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_tefeu"]
+
+[sub_resource type="GDScript" id="GDScript_tefeu"]
+resource_name = "spinny"
+script/source = "extends Node3D
+
+@export var speed : float = 10.0
+
+func _process(delta: float) -> void:
+	rotation_degrees.y += speed * delta
+"
+
+[sub_resource type="SphereMesh" id="SphereMesh_0bu2u"]
+radial_segments = 8
+rings = 3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_snqw0"]
+render_priority = 0
+shader = ExtResource("11_fvnj1")
+shader_parameter/u_vertex_color_use_as_albedo = false
+shader_parameter/u_albedo_texture = ExtResource("10_kho4m")
+shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
+script = ExtResource("5_bhsyx")
+cull_mode = 2
+fog_mode = 3
+vertex_color_use_as_albedo = false
+albedo_texture = ExtResource("10_kho4m")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n42xd"]
+render_priority = 0
+shader = ExtResource("7_svqmj")
+shader_parameter/u_vertex_color_use_as_albedo = false
+shader_parameter/u_albedo_color = Color(1, 1, 1, 1)
+script = ExtResource("5_bhsyx")
+vertex_color_use_as_albedo = false
+
+[sub_resource type="Gradient" id="Gradient_choun"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_im7ms"]
+script = ExtResource("12_0u04s")
+points = PackedVector3Array(0, 0, 0, 0, 1, 0)
+color_gradient = SubResource("Gradient_choun")
+metadata/_custom_type_script = "uid://bhof12h30k66g"
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8l7eo"]
+direction = Vector3(0, 1, 0)
+initial_velocity_min = 4.0
+initial_velocity_max = 4.0
+
+[sub_resource type="GDScript" id="GDScript_8l7eo"]
+script/source = "@tool class_name PixelPointMaterial extends ShaderMaterial
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v7yua"]
+script = SubResource("GDScript_8l7eo")
+
+[sub_resource type="QuadMesh" id="QuadMesh_agien"]
+material = SubResource("ShaderMaterial_v7yua")
+
+[node name="Main" type="Node3D" unique_id=1699994726]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=374673350]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+visible = false
+light_energy = 0.25
+shadow_enabled = true
+directional_shadow_pancake_size = 266.8
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2115240103]
+environment = SubResource("Environment_tipki")
+script = ExtResource("1_wfqjd")
+
+[node name="RigidBody3D4" type="StaticBody3D" parent="." unique_id=2080832859]
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="RigidBody3D4" unique_id=849679747]
+transform = Transform3D(1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0, 1.0015576, 0, 0, 0)
+mesh = SubResource("PlaneMesh_7ijgt")
+surface_material_override/0 = ExtResource("2_nlitt")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4" unique_id=1956428608]
+shape = SubResource("WorldBoundaryShape3D_tefeu")
+
+[node name="silly_ball" parent="." unique_id=1375805931 instance=ExtResource("3_5jxxg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
+speed_range = Vector2(5, 10)
+
+[node name="Node3D" type="Node3D" parent="." unique_id=1736152543]
+script = SubResource("GDScript_tefeu")
+
+[node name="Camera3D" type="Camera3D" parent="Node3D" unique_id=1162836696]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 12, 21)
+current = true
+fov = 20.0
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1556541999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.881119, 3, 3.369406)
+visible = false
+distance_fade_begin = 24.0
+distance_fade_length = 8.0
+
+[node name="PsxFogLightFader" type="Node" parent="OmniLight3D" unique_id=1692840559]
+script = ExtResource("9_c2t01")
+metadata/_custom_type_script = "uid://b7tof7505prr2"
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1564800933]
+transform = Transform3D(0.5850001, 0, -0.8110332, 0, 1, 0, 0.8110332, 0, 0.5850001, 0, 3, 4)
+visible = false
+
+[node name="skybox" type="MeshInstance3D" parent="." unique_id=1600318363]
+transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 9, 95, -57)
+visible = false
+mesh = SubResource("SphereMesh_0bu2u")
+surface_material_override/0 = SubResource("ShaderMaterial_snqw0")
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="." unique_id=1765450839]
+visible = false
+material_override = SubResource("ShaderMaterial_n42xd")
+mesh = SubResource("ImmediateMesh_im7ms")
+emission_shape = 6
+emission_ring_axis = Vector3(0, 1, 0)
+emission_ring_height = 1.0
+emission_ring_radius = 5.0
+emission_ring_inner_radius = 0.0
+emission_ring_cone_angle = 90.0
+direction = Vector3(0, 1, 0)
+spread = 5.0
+gravity = Vector3(0, 2, 0)
+initial_velocity_max = 10.0
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=231312829]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+visible = false
+transform_align = 1
+process_material = SubResource("ParticleProcessMaterial_8l7eo")
+draw_pass_1 = SubResource("QuadMesh_agien")
+
+[node name="radio2" parent="." unique_id=547690333 instance=ExtResource("13_5k30f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20465183, 4.4808154, 3.058625)
+visible = false
+
+[node name="radio3" parent="." unique_id=711847315 instance=ExtResource("14_8p84c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0675154, 4.4843016, 3.074855)
+visible = false
+
+[node name="radio4" parent="." unique_id=1477076530 instance=ExtResource("14_8p84c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2318064, 4.000001, 2.6782298)

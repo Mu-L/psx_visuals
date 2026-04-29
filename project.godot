@@ -15,6 +15,10 @@ run/main_scene="uid://bnpbxlpfbaicx"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.png"
 
+[audio]
+
+buses/default_bus_layout="uid://i30y242x4t3k"
+
 [autoload]
 
 psx_post_process="*uid://u3y0jxl0vtmg"
@@ -136,7 +140,7 @@ psx_affine_strength={
 }
 psx_fog_color={
 "type": "color",
-"value": Color(0.21, 0.21, 0.21, 1)
+"value": Color(1, 1, 1, 0)
 }
 psx_fog_far={
 "type": "float",

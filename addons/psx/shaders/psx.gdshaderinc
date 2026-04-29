@@ -163,10 +163,6 @@ void fragment() {
 	NORMAL = mix(NORMAL, vec3(0.0, 0.0, -1.0), v_fog_strength);
 	ALBEDO = mix(albedo.rgb, v_fog_color, v_fog_strength);
 	EMISSION += v_fog_color * v_fog_strength;
-#elif defined VERTEX_FOG_ALWAYS
-	NORMAL = vec3(0.0, 0.0, -1.0);
-	ALBEDO = v_fog_color;
-	EMISSION += v_fog_color;
 #else
 	ALBEDO = albedo.rgb;
 #endif
